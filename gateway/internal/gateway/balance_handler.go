@@ -1,19 +1,30 @@
 package gateway
 
 import (
+	cryptorand "crypto/rand"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
 
-	"github.com/MiChongs/karpov-gateway/gateway/internal/billing"
-	"github.com/MiChongs/karpov-gateway/gateway/internal/billing/payment"
+	"github.com/MiChongs/QQMusicApi/gateway/internal/billing"
+	"github.com/MiChongs/QQMusicApi/gateway/internal/billing/payment"
 )
+
+// buildTopupIdemKey 为一次充值生成全局唯一 idem key。每次调用都注入随机 nonce —
+// 同 user 同金额双击不会再命中老订单 dedup。
+func buildTopupIdemKey(userID string, amountCents int64) (string, error) {
+	var b [8]byte
+	if _, err := io.ReadFull(cryptorand.Reader, b[:]); err != nil {
+		return "", fmt.Errorf("topup idem nonce: %w", err)
+	}
+	return fmt.Sprintf("topup:%s:%d:%x", userID, amountCents, b[:]), nil
+}
 
 // BalanceHandler 提供"用户余额（钱包）"REST 端点：
 //
@@ -128,7 +139,13 @@ func (h *BalanceHandler) createTopup(c *gin.Context) {
 	}
 
 	amount := decimal.NewFromInt(body.AmountCents).Div(decimal.NewFromInt(100))
-	idem := fmt.Sprintf("topup:%s:%d:%d", uid, body.AmountCents, time.Now().Unix())
+	// 充值订单也加 nonce 防止同秒同金额双击命中 CreateOrder dedup（症状: 老订单 ID
+	// 二次提交给 LDC 触发 idx_orders_client_merchant_order 唯一约束爆炸）。
+	idem, idemErr := buildTopupIdemKey(uid, body.AmountCents)
+	if idemErr != nil {
+		Fail(c, http.StatusInternalServerError, CodeInternal, idemErr.Error())
+		return
+	}
 	order := &billing.Order{
 		ID:              billing.NewOrderID(),
 		UserID:          uid,
@@ -152,6 +169,11 @@ func (h *BalanceHandler) createTopup(c *gin.Context) {
 	created, err := h.billingSvc.CreateOrder(c.Request.Context(), order)
 	if err != nil {
 		Fail(c, http.StatusInternalServerError, CodeInternal, "create order failed: "+err.Error())
+		return
+	}
+	if created.Status != billing.OrderPending {
+		Fail(c, http.StatusConflict, CodeConflict,
+			fmt.Sprintf("topup order already exists (id=%s, status=%s)", created.ID, created.Status))
 		return
 	}
 

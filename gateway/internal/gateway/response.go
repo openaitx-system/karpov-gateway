@@ -30,6 +30,7 @@ const (
 	CodeForbidden      = 40300
 	CodeNotFound       = 40400
 	CodeBadRequest     = 40000
+	CodeConflict       = 40900
 	CodeRateLimited    = 42900
 	CodeQuotaExceeded  = 42901
 	CodeInternal       = 50000

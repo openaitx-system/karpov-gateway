@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"context"
+	cryptorand "crypto/rand"
 	"fmt"
 	"io"
 	"log/slog"
@@ -11,9 +12,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
 
-	"github.com/MiChongs/karpov-gateway/gateway/internal/auth"
-	"github.com/MiChongs/karpov-gateway/gateway/internal/billing"
-	"github.com/MiChongs/karpov-gateway/gateway/internal/billing/payment"
+	"github.com/MiChongs/QQMusicApi/gateway/internal/auth"
+	"github.com/MiChongs/QQMusicApi/gateway/internal/billing"
+	"github.com/MiChongs/QQMusicApi/gateway/internal/billing/payment"
 )
 
 // PaymentCallbackHandler 处理支付网关的异步回调。
@@ -253,6 +254,42 @@ type createOrderBody struct {
 	PlanID          string `json:"planId" binding:"required"`
 	PaymentProvider string `json:"paymentProvider" binding:"required"`
 	SuccessURL      string `json:"successUrl"`
+	// IdempotencyKey 可选：用于 client 安全重试同一逻辑下单（网络抖动场景）。
+	// 不传则后端按 userID:planID:provider:<random> 生成全新 key，保证每次调用唯一。
+	// 详见 docs：industry standard idempotency (Stripe / GitHub / AWS) — 同一 key 在 24h
+	// 内复用返回相同订单；不同 key 视为独立请求。
+	IdempotencyKey string `json:"idempotencyKey"`
+}
+
+// buildIdempotencyKey 校验 / 构造订单幂等键。
+//
+// 规则：
+//   - clientKey 非空：trim 后必须 1..128 字符 ASCII 可打印（[\x21-\x7e]）。直接当作
+//     idem 键使用。重复同 key 命中老订单（CreateOrder 层 dedup）。
+//   - clientKey 空：返回 fmt.Sprintf("%s:%s:%s:%s", userID, planID, provider, randHex)
+//     —— 有 user/plan/provider 上下文便于审计，randHex 保证全局唯一不与历史订单冲突。
+//
+// 这是修复 LDC duplicate-key bug 的关键：旧实现 idem=userID:planID:provider 没有 nonce，
+// 第二次订阅同一 plan 时 CreateOrder 会返回**已 paid 的老订单**，再把它的 ID 喂给
+// LDC → LDC 端 (client_id, merchant_order_no) 唯一约束爆炸。
+func buildIdempotencyKey(clientKey, userID, planID, provider string) (string, error) {
+	if k := strings.TrimSpace(clientKey); k != "" {
+		if len(k) > 128 {
+			return "", fmt.Errorf("idempotencyKey too long (max 128 chars, got %d)", len(k))
+		}
+		for i := 0; i < len(k); i++ {
+			c := k[i]
+			if c < 0x21 || c > 0x7e {
+				return "", fmt.Errorf("idempotencyKey contains non-printable ASCII at offset %d", i)
+			}
+		}
+		return k, nil
+	}
+	var b [8]byte
+	if _, err := io.ReadFull(cryptorand.Reader, b[:]); err != nil {
+		return "", fmt.Errorf("idempotencyKey nonce: %w", err)
+	}
+	return fmt.Sprintf("%s:%s:%s:%x", userID, planID, provider, b[:]), nil
 }
 
 func (h *PaymentCallbackHandler) createOrder(c *gin.Context) {
@@ -275,6 +312,12 @@ func (h *PaymentCallbackHandler) createOrder(c *gin.Context) {
 	planName := plan.Name
 	planPrice := decimal.NewFromInt(plan.PriceCents).Div(decimal.NewFromInt(100))
 
+	idemKey, err := buildIdempotencyKey(body.IdempotencyKey, userID, body.PlanID, body.PaymentProvider)
+	if err != nil {
+		Fail(c, http.StatusBadRequest, CodeBadRequest, err.Error())
+		return
+	}
+
 	order := &billing.Order{
 		ID:              billing.NewOrderID(),
 		UserID:          userID,
@@ -283,7 +326,7 @@ func (h *PaymentCallbackHandler) createOrder(c *gin.Context) {
 		Currency:        "CNY",
 		Status:          billing.OrderPending,
 		PaymentProvider: body.PaymentProvider,
-		IdempotencyKey:  fmt.Sprintf("%s:%s:%s", userID, body.PlanID, body.PaymentProvider),
+		IdempotencyKey:  idemKey,
 	}
 	if target := resolveTargetCurrency(body.PaymentProvider); target != "" && h.currency != nil {
 		if err := h.currency.ApplyCurrency(order, target); err != nil {
@@ -294,6 +337,16 @@ func (h *PaymentCallbackHandler) createOrder(c *gin.Context) {
 	order, createErr := h.billingSvc.CreateOrder(c.Request.Context(), order)
 	if createErr != nil {
 		Fail(c, http.StatusInternalServerError, CodeInternal, createErr.Error())
+		return
+	}
+	// 防御：CreateOrder 在 idem 命中时会返回已存在的订单。若该订单已离开 PENDING
+	// 状态（paying/paid/completed/...），说明 client 用了同一个 idempotencyKey 重放
+	// 一笔早已下单的请求。再把它的 ID 喂给 LDC 一定会触发 duplicate key violation，
+	// 所以这里直接 409 让 client 决定（继续支付旧订单 / 换 idempotencyKey）。
+	if order.Status != billing.OrderPending {
+		Fail(c, http.StatusConflict, CodeConflict,
+			fmt.Sprintf("order already exists (id=%s, status=%s); 如需新下单请用新的 idempotencyKey，或继续支付该订单",
+				order.ID, order.Status))
 		return
 	}
 

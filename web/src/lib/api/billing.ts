@@ -77,6 +77,13 @@ export const billingApi = {
     return unwrap(apiFetch<Wrapped<MyPlan> | MyPlan>("/billing/me/plan"));
   },
   subscribe(planId: string, paymentProvider: string) {
+    // 每次点击生成全新 idempotencyKey；网络抖动重试同一笔由 caller 复用同一 key 即可。
+    // 后端按此 key 在 CreateOrder 层 dedup —— 没有 nonce 会让第二次订阅命中老订单,
+    // 把老 order.ID 喂给上游支付（LDC）触发 unique constraint 报错。
+    const idempotencyKey =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     return unwrap(
       apiFetch<Wrapped<SubscribeResponse> | SubscribeResponse>("/billing/orders", {
         method: "POST",
@@ -84,6 +91,7 @@ export const billingApi = {
           planId,
           paymentProvider,
           successUrl: `${window.location.origin}/billing?payment=success`,
+          idempotencyKey,
         },
       }),
     );

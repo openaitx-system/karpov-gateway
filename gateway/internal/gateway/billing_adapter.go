@@ -2,7 +2,10 @@ package gateway
 
 import (
 	"context"
+	cryptorand "crypto/rand"
 	"errors"
+	"fmt"
+	"io"
 	"sync"
 	"time"
 
@@ -13,9 +16,9 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/MiChongs/karpov-gateway/gateway/internal/billing"
-	"github.com/MiChongs/karpov-gateway/gateway/internal/billing/payment"
-	billingv1 "github.com/MiChongs/karpov-gateway/gateway/internal/genproto/musicgw/billing/v1"
+	"github.com/MiChongs/QQMusicApi/gateway/internal/billing"
+	"github.com/MiChongs/QQMusicApi/gateway/internal/billing/payment"
+	billingv1 "github.com/MiChongs/QQMusicApi/gateway/internal/genproto/musicgw/billing/v1"
 )
 
 // BillingGRPCService 把 *billing.Service + 套餐目录 + 支付 Registry 适配为
@@ -57,6 +60,19 @@ func resolveTargetCurrency(provider string) string {
 	return providerSettlementCurrency[provider]
 }
 
+// newSubscribeIdemKey 为一次 Subscribe 调用生成全局唯一 idempotency key。
+//
+// 格式: "<userID>|<planCode>|<provider>|<8B-hex-nonce>"。前三字段做审计/分析用，
+// 末尾 nonce 保证不同次调用一定生成不同 key —— 这是修复 LDC duplicate-key 的关键：
+// CreateOrder 内部按 idem dedup，老 idem 复用会导致老 order.ID 被再次提交给 LDC。
+func newSubscribeIdemKey(userID, planCode, provider string) (string, error) {
+	var b [8]byte
+	if _, err := io.ReadFull(cryptorand.Reader, b[:]); err != nil {
+		return "", fmt.Errorf("subscribe idem nonce: %w", err)
+	}
+	return fmt.Sprintf("%s|%s|%s|%x", userID, planCode, provider, b[:]), nil
+}
+
 // ListPlans 实现 billingv1.BillingServiceServer.ListPlans。
 func (s *BillingGRPCService) ListPlans(_ context.Context, _ *billingv1.ListPlansRequest) (*billingv1.PlanList, error) {
 	plans := s.catalog.List()
@@ -88,7 +104,13 @@ func (s *BillingGRPCService) Subscribe(ctx context.Context, req *billingv1.Subsc
 	}
 
 	userID := userIDFromCtx(ctx) // 默认 anonymous（v0.4 接 SessionMiddleware）
-	idem := userID + "|" + plan.Code + "|" + time.Now().UTC().Format("200601021504")
+	// 每次 Subscribe 生成全新 idem nonce —— 之前用 "userID|plan|YYYYMMDDHHMM" 会让
+	// 同一分钟内重复点击命中 CreateOrder 的 dedup 路径，老订单 ID 又被重新提交给
+	// LDC，触发 LDC 端唯一约束 idx_orders_client_merchant_order 报错。
+	idem, err := newSubscribeIdemKey(userID, plan.Code, req.GetPaymentProvider())
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
 	order, err := billing.NewOrder(userID, plan.ID,
 		decimal.NewFromInt(plan.PriceCents).Div(decimal.NewFromInt(100)),
 		plan.Currency, idem, 30*time.Minute)
@@ -104,8 +126,16 @@ func (s *BillingGRPCService) Subscribe(ctx context.Context, req *billingv1.Subsc
 			return nil, status.Errorf(codes.FailedPrecondition, "currency: %v", err)
 		}
 	}
-	if _, err := s.svc.CreateOrder(ctx, order); err != nil {
+	saved, err := s.svc.CreateOrder(ctx, order)
+	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
+	}
+	// 防御：CreateOrder 在 idem 命中时会返回老订单。新生成的 idem 理论上不会命中,
+	// 但仍兜底 —— 老订单非 PENDING 时再喂给 LDC 必定 duplicate-key。
+	order = saved
+	if order.Status != billing.OrderPending {
+		return nil, status.Errorf(codes.AlreadyExists,
+			"order already exists (id=%s, status=%s)", order.ID, order.Status)
 	}
 	if _, err := s.svc.Transition(ctx, order.ID, billing.EvtPayStart); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
