@@ -1,0 +1,154 @@
+# ============================================================================
+# Music Gateway 开发依赖编排 —— PostgreSQL + pgAdmin + Redis
+#
+# 本编排仅负责跑外部依赖；后端 gateway 与 web 前端在 host 上跑：
+#   - gateway:  cd gateway && go run ./cmd/qqmusic-gateway
+#   - web:      cd web && pnpm dev
+#
+# 启动：
+#   cd deploy/compose && cp .env.example .env  (改密码) && docker compose up -d
+# 关闭并清理（含数据卷）：
+#   docker compose down -v
+#
+# 安全要点：
+#   - .env 不入库；密码强度自行保证；
+#   - 端口仅绑定到 host loopback (127.0.0.1)，避免 LAN 暴露；
+#   - PostgreSQL 强制 SCRAM-SHA-256；
+#   - Redis 必填密码 + 危险命令 rename 为空（FLUSHDB/FLUSHALL/CONFIG/DEBUG）；
+#   - pgAdmin 走 desktop mode（单用户）+ master password；
+#   - 不开放 host_network，避免穿透防火墙。
+# ============================================================================
+
+name: music-gateway-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: mgw-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mgw}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD 必填，请在 .env 填入}
+      POSTGRES_DB: ${POSTGRES_DB:-mgw}
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    networks:
+      - mgw-net
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U ${POSTGRES_USER:-mgw} -d ${POSTGRES_DB:-mgw}
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    stop_grace_period: 30s
+    security_opt:
+      - no-new-privileges:true
+
+  pgadmin:
+    # 9.14.0（2026-04-02）当前最新稳定版；版本号锁定避免 latest 漂移
+    image: dpage/pgadmin4:9.14
+    container_name: mgw-pgadmin
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # pgAdmin 自身的登录账号
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:?PGADMIN_DEFAULT_PASSWORD 必填}
+      PGADMIN_CONFIG_SERVER_MODE: "False" # desktop / 单用户模式
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      # 中文（简体）默认 UI；PGADMIN_CONFIG_* 值是 Python 字面量，
+      # 字符串需要再包一层引号 → "'zh'"
+      PGADMIN_CONFIG_DEFAULT_LANGUAGE: "'zh'"
+      PGADMIN_CONFIG_LOGIN_BANNER: "\"Music Gateway Console — 仅限授权访问\""
+      PGADMIN_CONFIG_CONSOLE_LOG_LEVEL: "30" # WARNING
+      PGADMIN_DISABLE_POSTFIX: "True" # 不要内置 MTA
+      # 让 servers.json 中的 ${POSTGRES_*} 占位被替换
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: ${POSTGRES_USER:-mgw}
+      POSTGRES_DB: ${POSTGRES_DB:-mgw}
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+    ports:
+      - "127.0.0.1:${PGADMIN_PORT:-5050}:80"
+    networks:
+      - mgw-net
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -qO- http://127.0.0.1:80/misc/ping || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    stop_grace_period: 30s
+    security_opt:
+      - no-new-privileges:true
+
+  redis:
+    image: redis:7-alpine
+    container_name: mgw-redis
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --requirepass
+      - ${REDIS_PASSWORD:?REDIS_PASSWORD 必填}
+      - --appendonly
+      - "yes"
+      - --maxmemory
+      - ${REDIS_MAXMEMORY:-256mb}
+      - --maxmemory-policy
+      - allkeys-lru
+      - --rename-command
+      - FLUSHDB
+      - ""
+      - --rename-command
+      - FLUSHALL
+      - ""
+      - --rename-command
+      - CONFIG
+      - ""
+      - --rename-command
+      - DEBUG
+      - ""
+    volumes:
+      - redis-data:/data
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+    networks:
+      - mgw-net
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - redis-cli -a "$$REDIS_PASSWORD" --no-auth-warning ping | grep -q PONG
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    stop_grace_period: 30s
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  mgw-net:
+    name: mgw-net
+    driver: bridge
+
+volumes:
+  postgres-data:
+    name: mgw-postgres-data
+  pgadmin-data:
+    name: mgw-pgadmin-data
+  redis-data:
+    name: mgw-redis-data

@@ -1,0 +1,21 @@
+[
+  {
+    "kind": "rsa_pkcs1v15_pubkey",
+    "pem": "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDEIxgwoutfwoJxcGQeedgP7FG9qaIuS0qzfR8gWkrkTZKM2iWHn2ajQpBRZjMSoSf6+KJGvar2ORhBfpDXyVtZCKpqLQ+FLkpncClKVIrBwv6PHyUvuCb0rIarmgDnzkfQAqVufEtR64iazGDKatvJ9y6B9NMbHddGSAUmRTCrHQIDAQAB\n-----END PUBLIC KEY-----"
+  },
+  {
+    "kind": "rsa_sample",
+    "plaintext_ascii": "0123456789abcdef",
+    "ciphertext_len": 128
+  },
+  {
+    "kind": "rsa_sample",
+    "plaintext_ascii": "fedcba9876543210",
+    "ciphertext_len": 128
+  },
+  {
+    "kind": "rsa_sample",
+    "plaintext_ascii": "deadbeefdeadbeef",
+    "ciphertext_len": 128
+  }
+]

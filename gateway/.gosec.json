@@ -1,0 +1,16 @@
+{
+  "audit-mode": false,
+  "severity": "high",
+  "confidence": "medium",
+  "exclude-dir": ["testdata", "bin"],
+  "exclude": [
+    "G401",
+    "G501",
+    "G505"
+  ],
+  "global": {
+    "audit": "false",
+    "nosec": "false"
+  },
+  "_comment_excludes": "G401/G501/G505 = MD5/SHA1/DES weak hash 警告。本项目刻意复用：MD5 用于支付签名（与上游网关协议绑定）；SHA1 用于 RFC 6238 TOTP（兼容 Google Authenticator）；3DES 用于 QQ 音乐歌词解密（与 LDDC 上游互通），而非加密用户数据。所有用户/订单数据加密走 AES-256-GCM。"
+}

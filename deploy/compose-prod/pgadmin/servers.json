@@ -1,0 +1,15 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Music Gateway (mgw-postgres)",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "mgw",
+      "Username": "mgw",
+      "SSLMode": "prefer",
+      "Comment": "compose 内部网络访问的 PostgreSQL；用户名/密码与 .env 一致",
+      "Shared": false
+    }
+  }
+}

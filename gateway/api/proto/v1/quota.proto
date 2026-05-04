@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package musicgw.quota.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/MiChongs/QQMusicApi/gateway/internal/genproto/musicgw/quota/v1;quotav1";
+
+// QuotaService 配额引擎，仅内部 gRPC 调用。
+service QuotaService {
+  rpc CheckAndConsume(CheckAndConsumeRequest) returns (Decision);
+  rpc Refund(RefundRequest) returns (google.protobuf.Empty);
+  rpc GetUsage(GetUsageRequest) returns (UsageReport);
+  rpc UpdateRule(UpdateRuleRequest) returns (google.protobuf.Empty);  // 管理员热更新
+}
+
+message CheckAndConsumeRequest {
+  string user_id = 1;
+  string provider = 2;
+  string endpoint = 3;
+  int32 weight_override = 4;  // >0 时覆盖 endpoint_weights 表（用于补偿）
+}
+
+message Decision {
+  Result result = 1;
+  int32 retry_after_ms = 2;   // SOFT_LIMIT 时返回
+  int64 used_today = 3;
+  int64 used_month = 4;
+  int64 limit_today = 5;
+  int64 limit_month = 6;
+  string reason = 7;
+}
+
+enum Result {
+  RESULT_UNSPECIFIED = 0;
+  RESULT_ALLOW = 1;
+  RESULT_SOFT_LIMIT = 2;
+  RESULT_HARD_LIMIT = 3;
+}
+
+message RefundRequest {
+  string user_id = 1;
+  string provider = 2;
+  string endpoint = 3;
+  int32 weight = 4;
+  string reason = 5;        // provider_error / network_error / explicit
+}
+
+message GetUsageRequest {
+  string user_id = 1;
+  google.protobuf.Timestamp from = 2;
+  google.protobuf.Timestamp to = 3;
+  string provider = 4;      // 空表示所有
+}
+message UsageReport {
+  repeated UsageDay days = 1;
+  int64 total_count = 2;
+  int64 total_weight = 3;
+}
+message UsageDay {
+  string date = 1;          // YYYY-MM-DD
+  string provider = 2;
+  int64 count = 3;
+  int64 weight = 4;
+}
+
+message UpdateRuleRequest {
+  string user_id = 1;
+  string provider = 2;
+  int64 monthly_limit = 3;
+  int64 daily_limit = 4;
+  int32 soft_limit_pct = 5;
+}

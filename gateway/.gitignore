@@ -1,0 +1,37 @@
+# Build artifacts
+/bin/
+/dist/
+*.exe
+*.test
+*.out
+coverage.txt
+coverage.html
+
+# IDE
+/.idea/
+/.vscode/
+*.swp
+
+# Local config
+/.env
+/.env.*
+!/.env.example
+/config.local.*
+
+# Generated proto outputs (regenerated via `make proto`)
+/api/openapi/*.swagger.json
+**/*.pb.go
+**/*.pb.gw.go
+
+# sqlc generated (regenerated via `make sqlc`)
+/internal/store/sqlc/
+
+# Local data
+/tmp/
+/data/
+*.db
+*.db-journal
+
+# Go workspace
+/go.work
+/go.work.sum

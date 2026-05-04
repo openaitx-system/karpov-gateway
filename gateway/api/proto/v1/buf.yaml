@@ -1,0 +1,21 @@
+version: v2
+modules:
+  - path: .
+deps:
+  - buf.build/googleapis/googleapis
+  - buf.build/grpc-ecosystem/grpc-gateway
+lint:
+  use:
+    - STANDARD
+  except:
+    - PACKAGE_VERSION_SUFFIX
+    - FIELD_LOWER_SNAKE_CASE
+    - PACKAGE_DIRECTORY_MATCH      # 当前所有 proto 在 v1/ 一个目录里；多 service 共存
+    - PACKAGE_SAME_DIRECTORY       # 同上
+    - DIRECTORY_SAME_PACKAGE       # 同上 — 多 service 共存于 v1/
+    - RPC_REQUEST_RESPONSE_UNIQUE  # 允许复用 google.protobuf.Empty
+    - RPC_REQUEST_STANDARD_NAME    # 允许复用 Empty
+    - RPC_RESPONSE_STANDARD_NAME   # 允许复用 Empty / 复用业务消息
+breaking:
+  use:
+    - FILE

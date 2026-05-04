@@ -1,0 +1,478 @@
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+/* =====================================================================
+ * 默认主题 — Neutral 中性灰（shadcn 默认）
+ * ===================================================================== */
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+}
+
+/* =====================================================================
+ * Claude 主题 — 暖橙陶土 × 米白沙
+ * 色相锚点 H≈45-65（暖橙），所有中性灰沿 H=60 微染色形成整体暖意
+ * ===================================================================== */
+[data-color-theme="claude"] {
+  --background: oklch(0.985 0.006 80);
+  --foreground: oklch(0.205 0.014 60);
+  --card: oklch(1 0.002 80);
+  --card-foreground: oklch(0.205 0.014 60);
+  --popover: oklch(1 0.002 80);
+  --popover-foreground: oklch(0.205 0.014 60);
+  --primary: oklch(0.625 0.155 41);
+  --primary-foreground: oklch(0.985 0.006 80);
+  --secondary: oklch(0.945 0.014 70);
+  --secondary-foreground: oklch(0.305 0.018 55);
+  --muted: oklch(0.945 0.014 70);
+  --muted-foreground: oklch(0.495 0.016 55);
+  --accent: oklch(0.92 0.030 60);
+  --accent-foreground: oklch(0.305 0.024 50);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.89 0.018 65);
+  --input: oklch(0.89 0.018 65);
+  --ring: oklch(0.625 0.155 41);
+  --chart-1: oklch(0.625 0.155 41);
+  --chart-2: oklch(0.68 0.13 75);
+  --chart-3: oklch(0.56 0.12 25);
+  --chart-4: oklch(0.72 0.10 55);
+  --chart-5: oklch(0.50 0.09 50);
+}
+
+[data-color-theme="claude"].dark {
+  --background: oklch(0.165 0.014 50);
+  --foreground: oklch(0.95 0.010 80);
+  --card: oklch(0.21 0.016 52);
+  --card-foreground: oklch(0.95 0.010 80);
+  --popover: oklch(0.21 0.016 52);
+  --popover-foreground: oklch(0.95 0.010 80);
+  --primary: oklch(0.72 0.145 44);
+  --primary-foreground: oklch(0.18 0.014 50);
+  --secondary: oklch(0.265 0.018 52);
+  --secondary-foreground: oklch(0.95 0.010 80);
+  --muted: oklch(0.265 0.018 52);
+  --muted-foreground: oklch(0.705 0.014 60);
+  --accent: oklch(0.305 0.028 50);
+  --accent-foreground: oklch(0.95 0.012 75);
+  --destructive: oklch(0.45 0.16 27);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.30 0.022 50);
+  --input: oklch(0.30 0.022 50);
+  --ring: oklch(0.72 0.145 44);
+  --chart-1: oklch(0.72 0.145 44);
+  --chart-2: oklch(0.75 0.13 75);
+  --chart-3: oklch(0.65 0.12 25);
+  --chart-4: oklch(0.78 0.10 55);
+  --chart-5: oklch(0.60 0.09 50);
+}
+
+/* =====================================================================
+ * Rose 主题 — 玫瑰红 × 微染粉白
+ * 色相锚点 H≈350（粉红），中性灰沿 H=348 微染色
+ * ===================================================================== */
+[data-color-theme="rose"] {
+  --background: oklch(0.992 0.004 348);
+  --foreground: oklch(0.185 0.014 340);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.185 0.014 340);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.185 0.014 340);
+  --primary: oklch(0.645 0.246 16.439);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.962 0.012 350);
+  --secondary-foreground: oklch(0.305 0.040 0);
+  --muted: oklch(0.962 0.012 350);
+  --muted-foreground: oklch(0.498 0.022 348);
+  --accent: oklch(0.945 0.030 12);
+  --accent-foreground: oklch(0.305 0.080 16);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.91 0.016 350);
+  --input: oklch(0.91 0.016 350);
+  --ring: oklch(0.645 0.246 16.439);
+  --chart-1: oklch(0.645 0.246 16.439);
+  --chart-2: oklch(0.70 0.18 350);
+  --chart-3: oklch(0.55 0.20 30);
+  --chart-4: oklch(0.62 0.18 0);
+  --chart-5: oklch(0.48 0.16 350);
+}
+
+[data-color-theme="rose"].dark {
+  --background: oklch(0.16 0.020 340);
+  --foreground: oklch(0.96 0.010 348);
+  --card: oklch(0.21 0.022 340);
+  --card-foreground: oklch(0.96 0.010 348);
+  --popover: oklch(0.21 0.022 340);
+  --popover-foreground: oklch(0.96 0.010 348);
+  --primary: oklch(0.696 0.17 17.567);
+  --primary-foreground: oklch(0.985 0.006 348);
+  --secondary: oklch(0.27 0.026 340);
+  --secondary-foreground: oklch(0.96 0.010 348);
+  --muted: oklch(0.27 0.026 340);
+  --muted-foreground: oklch(0.71 0.014 350);
+  --accent: oklch(0.31 0.045 10);
+  --accent-foreground: oklch(0.95 0.018 348);
+  --destructive: oklch(0.45 0.16 25);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.30 0.028 340);
+  --input: oklch(0.30 0.028 340);
+  --ring: oklch(0.696 0.17 17.567);
+  --chart-1: oklch(0.696 0.17 17.567);
+  --chart-2: oklch(0.75 0.14 348);
+  --chart-3: oklch(0.65 0.16 30);
+  --chart-4: oklch(0.70 0.15 0);
+  --chart-5: oklch(0.55 0.13 348);
+}
+
+/* =====================================================================
+ * Blue 主题 — 靛蓝 × 微染冰白
+ * 色相锚点 H≈252（蓝），中性灰沿 H=252 微染色
+ * ===================================================================== */
+[data-color-theme="blue"] {
+  --background: oklch(0.99 0.005 252);
+  --foreground: oklch(0.18 0.014 256);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.014 256);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.014 256);
+  --primary: oklch(0.546 0.215 262.881);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.96 0.014 250);
+  --secondary-foreground: oklch(0.305 0.060 258);
+  --muted: oklch(0.96 0.014 250);
+  --muted-foreground: oklch(0.498 0.024 252);
+  --accent: oklch(0.94 0.032 252);
+  --accent-foreground: oklch(0.305 0.110 258);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.91 0.018 250);
+  --input: oklch(0.91 0.018 250);
+  --ring: oklch(0.546 0.215 262.881);
+  --chart-1: oklch(0.546 0.215 262.881);
+  --chart-2: oklch(0.65 0.18 230);
+  --chart-3: oklch(0.50 0.20 280);
+  --chart-4: oklch(0.60 0.16 250);
+  --chart-5: oklch(0.45 0.18 260);
+}
+
+[data-color-theme="blue"].dark {
+  --background: oklch(0.16 0.022 256);
+  --foreground: oklch(0.96 0.010 252);
+  --card: oklch(0.21 0.024 256);
+  --card-foreground: oklch(0.96 0.010 252);
+  --popover: oklch(0.21 0.024 256);
+  --popover-foreground: oklch(0.96 0.010 252);
+  --primary: oklch(0.623 0.214 259.815);
+  --primary-foreground: oklch(0.985 0.006 252);
+  --secondary: oklch(0.27 0.030 256);
+  --secondary-foreground: oklch(0.96 0.010 252);
+  --muted: oklch(0.27 0.030 256);
+  --muted-foreground: oklch(0.71 0.016 252);
+  --accent: oklch(0.31 0.060 256);
+  --accent-foreground: oklch(0.95 0.020 252);
+  --destructive: oklch(0.45 0.16 27);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.30 0.034 256);
+  --input: oklch(0.30 0.034 256);
+  --ring: oklch(0.623 0.214 259.815);
+  --chart-1: oklch(0.623 0.214 259.815);
+  --chart-2: oklch(0.72 0.15 230);
+  --chart-3: oklch(0.62 0.18 280);
+  --chart-4: oklch(0.70 0.13 250);
+  --chart-5: oklch(0.55 0.17 260);
+}
+
+/* =====================================================================
+ * Green 主题 — Emerald 翠绿 × 微染薄荷白
+ * 色相锚点 H≈155（翠绿），中性灰沿 H=155 微染色
+ * ===================================================================== */
+[data-color-theme="green"] {
+  --background: oklch(0.99 0.006 150);
+  --foreground: oklch(0.18 0.020 158);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.020 158);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.020 158);
+  --primary: oklch(0.527 0.154 150.069);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.96 0.016 150);
+  --secondary-foreground: oklch(0.305 0.060 155);
+  --muted: oklch(0.96 0.016 150);
+  --muted-foreground: oklch(0.498 0.026 152);
+  --accent: oklch(0.93 0.040 152);
+  --accent-foreground: oklch(0.305 0.110 155);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.91 0.022 150);
+  --input: oklch(0.91 0.022 150);
+  --ring: oklch(0.527 0.154 150.069);
+  --chart-1: oklch(0.527 0.154 150.069);
+  --chart-2: oklch(0.65 0.15 175);
+  --chart-3: oklch(0.55 0.16 130);
+  --chart-4: oklch(0.62 0.14 165);
+  --chart-5: oklch(0.45 0.13 145);
+}
+
+[data-color-theme="green"].dark {
+  --background: oklch(0.16 0.024 158);
+  --foreground: oklch(0.96 0.012 150);
+  --card: oklch(0.21 0.028 158);
+  --card-foreground: oklch(0.96 0.012 150);
+  --popover: oklch(0.21 0.028 158);
+  --popover-foreground: oklch(0.96 0.012 150);
+  --primary: oklch(0.696 0.17 162.48);
+  --primary-foreground: oklch(0.20 0.022 158);
+  --secondary: oklch(0.27 0.032 158);
+  --secondary-foreground: oklch(0.96 0.012 150);
+  --muted: oklch(0.27 0.032 158);
+  --muted-foreground: oklch(0.71 0.018 152);
+  --accent: oklch(0.31 0.060 155);
+  --accent-foreground: oklch(0.95 0.022 150);
+  --destructive: oklch(0.45 0.16 27);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.30 0.036 158);
+  --input: oklch(0.30 0.036 158);
+  --ring: oklch(0.696 0.17 162.48);
+  --chart-1: oklch(0.696 0.17 162.48);
+  --chart-2: oklch(0.75 0.14 175);
+  --chart-3: oklch(0.65 0.15 130);
+  --chart-4: oklch(0.72 0.13 165);
+  --chart-5: oklch(0.55 0.12 145);
+}
+
+/* =====================================================================
+ * Violet 主题 — 紫罗兰 × 微染淡紫
+ * 色相锚点 H≈293（紫），中性灰沿 H=295 微染色
+ * ===================================================================== */
+[data-color-theme="violet"] {
+  --background: oklch(0.99 0.006 295);
+  --foreground: oklch(0.18 0.020 295);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.020 295);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.020 295);
+  --primary: oklch(0.541 0.281 293.009);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.96 0.016 295);
+  --secondary-foreground: oklch(0.305 0.080 293);
+  --muted: oklch(0.96 0.016 295);
+  --muted-foreground: oklch(0.498 0.028 295);
+  --accent: oklch(0.93 0.045 290);
+  --accent-foreground: oklch(0.305 0.140 293);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.91 0.022 295);
+  --input: oklch(0.91 0.022 295);
+  --ring: oklch(0.541 0.281 293.009);
+  --chart-1: oklch(0.541 0.281 293.009);
+  --chart-2: oklch(0.65 0.20 320);
+  --chart-3: oklch(0.55 0.22 270);
+  --chart-4: oklch(0.60 0.18 295);
+  --chart-5: oklch(0.48 0.20 305);
+}
+
+[data-color-theme="violet"].dark {
+  --background: oklch(0.16 0.024 295);
+  --foreground: oklch(0.96 0.012 295);
+  --card: oklch(0.21 0.028 295);
+  --card-foreground: oklch(0.96 0.012 295);
+  --popover: oklch(0.21 0.028 295);
+  --popover-foreground: oklch(0.96 0.012 295);
+  --primary: oklch(0.707 0.213 293.009);
+  --primary-foreground: oklch(0.985 0.012 295);
+  --secondary: oklch(0.27 0.034 295);
+  --secondary-foreground: oklch(0.96 0.012 295);
+  --muted: oklch(0.27 0.034 295);
+  --muted-foreground: oklch(0.71 0.018 295);
+  --accent: oklch(0.31 0.075 293);
+  --accent-foreground: oklch(0.95 0.022 295);
+  --destructive: oklch(0.45 0.16 27);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.30 0.040 295);
+  --input: oklch(0.30 0.040 295);
+  --ring: oklch(0.707 0.213 293.009);
+  --chart-1: oklch(0.707 0.213 293.009);
+  --chart-2: oklch(0.75 0.16 320);
+  --chart-3: oklch(0.65 0.18 270);
+  --chart-4: oklch(0.70 0.14 295);
+  --chart-5: oklch(0.55 0.16 305);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  html, body {
+    height: 100%;
+  }
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+}
+
+/* =====================================================================
+ * 全局滚动条美化（Webkit + Firefox）
+ * 设计：静默态近乎隐形，hover 时优雅浮现
+ * ===================================================================== */
+
+/* Webkit (Chrome / Edge / Safari) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px 0;
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(0.72 0.01 60 / 0.2);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: background 0.2s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.55 0.02 60 / 0.5);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:active {
+  background: oklch(0.45 0.03 60 / 0.65);
+  border: 1px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: oklch(0.45 0.01 60 / 0.25);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.6 0.02 60 / 0.5);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.dark ::-webkit-scrollbar-thumb:active {
+  background: oklch(0.7 0.02 60 / 0.65);
+  border: 1px solid transparent;
+  background-clip: content-box;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0.72 0.01 60 / 0.2) transparent;
+}
+.dark * {
+  scrollbar-color: oklch(0.45 0.01 60 / 0.25) transparent;
+}
+
+/* =====================================================================
+ * 全局过渡 & 微交互
+ * ===================================================================== */
+::selection {
+  background: oklch(0.625 0.155 41 / 0.25);
+}
+.dark ::selection {
+  background: oklch(0.625 0.155 41 / 0.35);
+}
+
+/* 焦点环优化 */
+:focus-visible {
+  outline: 2px solid oklch(0.625 0.155 41 / 0.5);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}

@@ -1,0 +1,79 @@
+# 本地开发编排：仅启动依赖（PG + Redis），服务用 `make run-*` 在宿主直跑
+name: musicgw-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: musicgw-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: musicgw
+      # PG 容器的系统时区（影响 psql 直连显示和 server-side now() 默认时区）。
+      # 应用层优先用 gateway 启动时通过 DSN 下发的 timezone（参考 store.AppendTimeZone），
+      # 这里只是让 docker exec / psql 进容器看到一致的时间。空 = UTC（alpine 默认）。
+      TZ: ${TZ:-UTC}
+      PGTZ: ${TZ:-UTC}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d musicgw"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: musicgw-redis
+    command:
+      - redis-server
+      - --maxmemory
+      - "256mb"
+      - --maxmemory-policy
+      - "allkeys-lru"
+      - --save
+      - ""           # 关 RDB 持久化（开发环境）
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # 可选：MailHog 用于本地邮件验证
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: musicgw-mailhog
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    profiles: ["mail"]
+
+  # 可选：Jaeger 用于本地 trace 可视化
+  jaeger:
+    image: jaegertracing/all-in-one:1.62
+    container_name: musicgw-jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"  # UI
+      - "4317:4317"    # OTLP gRPC
+      - "4318:4318"    # OTLP HTTP
+    profiles: ["trace"]
+
+  # 可选：Prometheus
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: musicgw-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    profiles: ["metrics"]
+
+volumes:
+  pgdata:

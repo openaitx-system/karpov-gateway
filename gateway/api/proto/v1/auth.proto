@@ -1,0 +1,257 @@
+syntax = "proto3";
+
+package musicgw.auth.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/MiChongs/QQMusicApi/gateway/internal/genproto/musicgw/auth/v1;authv1";
+
+// AuthService 用户/会话/API Key/2FA。
+//
+// 注意：登录态使用服务端 Session（Redis 后端），不签发 JWT。
+// API Key 仅在创建时返回明文，DB 仅存 argon2id 哈希。
+service AuthService {
+  rpc Register(RegisterRequest) returns (RegisterResponse) {
+    option (google.api.http) = { post: "/v1/auth/register" body: "*" };
+  }
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = { post: "/v1/auth/login" body: "*" };
+  }
+  rpc Logout(LogoutRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = { post: "/v1/auth/logout" body: "*" };
+  }
+  rpc Me(MeRequest) returns (User) {
+    option (google.api.http) = { get: "/v1/auth/me" };
+  }
+  rpc ChangePassword(ChangePasswordRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = { post: "/v1/auth/password/change" body: "*" };
+  }
+  rpc RequestPasswordReset(RequestPasswordResetRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = { post: "/v1/auth/password/reset/request" body: "*" };
+  }
+  rpc ResetPassword(ResetPasswordRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = { post: "/v1/auth/password/reset" body: "*" };
+  }
+  // VerifyEmail 用激活 token 把账号从 pending_email 切到 active。
+  // 前端 /activate?token=xxx 页面读出 token 并调本接口；返回 user_id + email 用于显示成功状态。
+  rpc VerifyEmail(VerifyEmailRequest) returns (VerifyEmailResponse) {
+    option (google.api.http) = { post: "/v1/auth/email/verify" body: "*" };
+  }
+
+  // ResendActivation 重发激活邮件。
+  // 静默成功语义：邮箱不存在 / 已激活 ⇒ 仍返回 200，避免暴露用户存在性。
+  rpc ResendActivation(ResendActivationRequest) returns (ResendActivationResponse) {
+    option (google.api.http) = { post: "/v1/auth/email/resend" body: "*" };
+  }
+
+  // SendEmailCode 给指定邮箱发送 6 位数字验证码（注册流程第一步）。
+  // 服务端按 cooldown / per-email / per-IP 三层频控；命中白/黑名单的域名直接拒绝。
+  rpc SendEmailCode(SendEmailCodeRequest) returns (SendEmailCodeResponse) {
+    option (google.api.http) = { post: "/v1/auth/email/send-code" body: "*" };
+  }
+
+  // ---- 2FA ----
+  // EnableTOTP 第一步：服务端生成新 secret + otpauth URL，缓存为"待确认"，
+  // 不立即激活。客户端展示 QR / secret 让用户在 Authenticator 中保存。
+  rpc EnableTOTP(EnableTOTPRequest) returns (TOTPSecret) {
+    option (google.api.http) = { post: "/v1/auth/totp/enable" body: "*" };
+  }
+  // ConfirmEnableTOTP 第二步：用户输入 Authenticator 当前 6 位码确认，
+  // 后端验证通过后才把 secret 落库并把 totp_enabled 置为 true。返回新的 User。
+  rpc ConfirmEnableTOTP(ConfirmEnableTOTPRequest) returns (User) {
+    option (google.api.http) = { post: "/v1/auth/totp/enable/confirm" body: "*" };
+  }
+  // VerifyTOTP 是登录流程第二步：拿 LoginResponse.challenge_id + 6 位码换 sid。
+  rpc VerifyTOTP(VerifyTOTPRequest) returns (TOTPResult) {
+    option (google.api.http) = { post: "/v1/auth/totp/verify" body: "*" };
+  }
+  rpc DisableTOTP(DisableTOTPRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = { post: "/v1/auth/totp/disable" body: "*" };
+  }
+
+  // ---- API Key 管理 ----
+  rpc CreateAPIKey(CreateAPIKeyRequest) returns (APIKey) {
+    option (google.api.http) = { post: "/v1/auth/api-keys" body: "*" };
+  }
+  rpc ListAPIKeys(ListAPIKeysRequest) returns (APIKeyList) {
+    option (google.api.http) = { get: "/v1/auth/api-keys" };
+  }
+  rpc GetAPIKey(GetAPIKeyRequest) returns (APIKey) {
+    option (google.api.http) = { get: "/v1/auth/api-keys/{id}" };
+  }
+  rpc UpdateAPIKey(UpdateAPIKeyRequest) returns (APIKey) {
+    option (google.api.http) = { patch: "/v1/auth/api-keys/{id}" body: "*" };
+  }
+  rpc SetAPIKeyEnabled(SetAPIKeyEnabledRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = { post: "/v1/auth/api-keys/{id}/enabled" body: "*" };
+  }
+  rpc RevokeAPIKey(RevokeAPIKeyRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = { delete: "/v1/auth/api-keys/{id}" };
+  }
+}
+
+// ---------- 请求/响应 ----------
+
+message RegisterRequest {
+  string email = 1;
+  string password = 2;
+  // verification_code 仅当部署启用了"邮箱验证码注册"才必填。
+  // 前端通过 RuntimeConfig.email_verification.required 决定是否显示该字段。
+  string verification_code = 3;
+}
+message RegisterResponse {
+  string user_id = 1;
+  bool email_verification_required = 2;
+  // activation_email_sent：true ⇒ 后端启用了"账号激活"，刚发送了一封激活邮件，
+  // 前端应当切到"请去邮箱点击激活链接"成功页而不是直接跳登录。
+  bool activation_email_sent = 3;
+  // 提示用户去哪个邮箱看激活链接（与 request.email 同值；前端可省去回填）。
+  string email = 4;
+}
+
+// SendEmailCode：给邮箱发送一次性 6 位数字验证码。
+// 频控由服务端实现：默认每邮箱 60s 冷却 + 1 小时 5 次上限；超限返回 ResourceExhausted。
+message SendEmailCodeRequest {
+  string email = 1;
+  // purpose 仅作日志区分（"register" / "reset" 等）；当前后端只关心邮箱本身。
+  string purpose = 2;
+}
+message SendEmailCodeResponse {
+  // 距离下次可发的秒数；前端据此渲染倒计时。
+  int32 cooldown_seconds = 1;
+  // expires_in_seconds 验证码自身的有效期；前端可在表单旁展示。
+  int32 expires_in_seconds = 2;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+  string totp_code = 3;  // 启用 2FA 时必填
+}
+message LoginResponse {
+  string sid = 1;
+  google.protobuf.Timestamp expires_at = 2;
+  bool totp_required = 3;     // 仅当首次校验未带 totp_code 且账号已启用 TOTP
+  string challenge_id = 4;    // 配合 totp_required，下一步带回
+}
+
+message LogoutRequest {
+  string sid = 1;
+}
+
+message MeRequest {}
+
+message User {
+  string id = 1;
+  string email = 2;
+  string status = 3;     // active / locked / pending_email
+  bool totp_enabled = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp last_login_at = 6;
+  string role = 7;       // user / admin / superadmin
+}
+
+message ChangePasswordRequest {
+  string old_password = 1;
+  string new_password = 2;
+}
+
+message RequestPasswordResetRequest {
+  string email = 1;
+}
+
+message ResetPasswordRequest {
+  string token = 1;
+  string new_password = 2;
+}
+
+message VerifyEmailRequest {
+  string token = 1;
+}
+message VerifyEmailResponse {
+  string user_id = 1;
+  string email = 2;
+}
+
+message ResendActivationRequest {
+  string email = 1;
+}
+message ResendActivationResponse {
+  // 距离下次可发的秒数；命中频控时即便操作整体静默成功也会回非零冷却让前端按钮变灰。
+  int32 cooldown_seconds = 1;
+}
+
+// ---- TOTP ----
+message EnableTOTPRequest {}
+message TOTPSecret {
+  string secret_base32 = 1;
+  string otpauth_url = 2;   // 用于二维码渲染
+}
+message ConfirmEnableTOTPRequest {
+  string code = 1;          // Authenticator 当前 6 位
+}
+message VerifyTOTPRequest {
+  string challenge_id = 1;  // 来自 LoginResponse
+  string code = 2;
+}
+message TOTPResult {
+  string sid = 1;
+  google.protobuf.Timestamp expires_at = 2;
+}
+message DisableTOTPRequest {
+  string code = 1;          // 二次确认
+}
+
+// ---- API Key ----
+message CreateAPIKeyRequest {
+  string name = 1;
+  repeated string scopes = 2;       // e.g. ["music:read","billing:read"]
+  google.protobuf.Timestamp expires_at = 3;
+  repeated string ip_allowlist = 4; // CIDR 列表，可空
+  int32 rate_limit_rpm = 5;         // 每分钟请求数上限（0 = 不限）
+  int64 rate_limit_daily = 6;       // 每日请求数上限（0 = 不限）
+  string description = 7;           // 用户备注
+}
+message UpdateAPIKeyRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  repeated string scopes = 4;
+  repeated string ip_allowlist = 5;
+  int32 rate_limit_rpm = 6;
+  int64 rate_limit_daily = 7;
+  google.protobuf.Timestamp expires_at = 8;
+}
+message GetAPIKeyRequest {
+  string id = 1;
+}
+message SetAPIKeyEnabledRequest {
+  string id = 1;
+  bool enabled = 2;
+}
+message APIKey {
+  string id = 1;
+  string prefix = 2;
+  string plaintext = 3;             // 仅 Create 时返回
+  string name = 4;
+  repeated string scopes = 5;
+  google.protobuf.Timestamp expires_at = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp last_used_at = 8;
+  repeated string ip_allowlist = 9;
+  int32 rate_limit_rpm = 10;        // 每分钟请求数上限
+  int64 rate_limit_daily = 11;      // 每日请求数上限
+  bool enabled = 12;
+  string status = 13;               // active / disabled / expired / revoked
+  string description = 14;
+  int64 total_requests = 15;        // 累计请求总数
+}
+message ListAPIKeysRequest {}
+message APIKeyList {
+  repeated APIKey items = 1;
+}
+message RevokeAPIKeyRequest {
+  string id = 1;
+}

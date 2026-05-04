@@ -1,0 +1,182 @@
+[
+  {
+    "key_hex": "21402329284e484c6975792a24255e2635647341464b4a55",
+    "mode": "ENCRYPT",
+    "in_hex": "0000000000000000",
+    "out_hex": "576bc124cdca8d91"
+  },
+  {
+    "key_hex": "21402329284e484c6975792a24255e2635647341464b4a55",
+    "mode": "DECRYPT",
+    "in_hex": "0000000000000000",
+    "out_hex": "21fc5f1c2f5de384"
+  },
+  {
+    "key_hex": "21402329284e484c6975792a24255e2635647341464b4a55",
+    "mode": "ENCRYPT",
+    "in_hex": "ffffffffffffffff",
+    "out_hex": "34cc65b786cd9a6d"
+  },
+  {
+    "key_hex": "21402329284e484c6975792a24255e2635647341464b4a55",
+    "mode": "DECRYPT",
+    "in_hex": "ffffffffffffffff",
+    "out_hex": "9f2376e7e5ca60be"
+  },
+  {
+    "key_hex": "21402329284e484c6975792a24255e2635647341464b4a55",
+    "mode": "ENCRYPT",
+    "in_hex": "3031323334353637",
+    "out_hex": "27f36296511ea755"
+  },
+  {
+    "key_hex": "21402329284e484c6975792a24255e2635647341464b4a55",
+    "mode": "DECRYPT",
+    "in_hex": "3031323334353637",
+    "out_hex": "d811244cce829fa5"
+  },
+  {
+    "key_hex": "21402329284e484c6975792a24255e2635647341464b4a55",
+    "mode": "ENCRYPT",
+    "in_hex": "4142434445464748",
+    "out_hex": "dcc12ab6999fc97d"
+  },
+  {
+    "key_hex": "21402329284e484c6975792a24255e2635647341464b4a55",
+    "mode": "DECRYPT",
+    "in_hex": "4142434445464748",
+    "out_hex": "d62e5edef174fc71"
+  },
+  {
+    "key_hex": "21402329284e484c6975792a24255e2635647341464b4a55",
+    "mode": "ENCRYPT",
+    "in_hex": "0001020304050607",
+    "out_hex": "9584215ec1c805f2"
+  },
+  {
+    "key_hex": "21402329284e484c6975792a24255e2635647341464b4a55",
+    "mode": "DECRYPT",
+    "in_hex": "0001020304050607",
+    "out_hex": "8848c1456f58a240"
+  },
+  {
+    "key_hex": "6162636465666768696a6b6c6d6e6f707172737475767778",
+    "mode": "ENCRYPT",
+    "in_hex": "0000000000000000",
+    "out_hex": "af50daf23da2968f"
+  },
+  {
+    "key_hex": "6162636465666768696a6b6c6d6e6f707172737475767778",
+    "mode": "DECRYPT",
+    "in_hex": "0000000000000000",
+    "out_hex": "80d150421af84f28"
+  },
+  {
+    "key_hex": "6162636465666768696a6b6c6d6e6f707172737475767778",
+    "mode": "ENCRYPT",
+    "in_hex": "ffffffffffffffff",
+    "out_hex": "e81ef0afb1dab247"
+  },
+  {
+    "key_hex": "6162636465666768696a6b6c6d6e6f707172737475767778",
+    "mode": "DECRYPT",
+    "in_hex": "ffffffffffffffff",
+    "out_hex": "68620718fff5e305"
+  },
+  {
+    "key_hex": "6162636465666768696a6b6c6d6e6f707172737475767778",
+    "mode": "ENCRYPT",
+    "in_hex": "3031323334353637",
+    "out_hex": "fd3c96730a0962d3"
+  },
+  {
+    "key_hex": "6162636465666768696a6b6c6d6e6f707172737475767778",
+    "mode": "DECRYPT",
+    "in_hex": "3031323334353637",
+    "out_hex": "39fd6c1f9bc121ef"
+  },
+  {
+    "key_hex": "6162636465666768696a6b6c6d6e6f707172737475767778",
+    "mode": "ENCRYPT",
+    "in_hex": "4142434445464748",
+    "out_hex": "14abfc905c001186"
+  },
+  {
+    "key_hex": "6162636465666768696a6b6c6d6e6f707172737475767778",
+    "mode": "DECRYPT",
+    "in_hex": "4142434445464748",
+    "out_hex": "3d70c3de6bdb463d"
+  },
+  {
+    "key_hex": "6162636465666768696a6b6c6d6e6f707172737475767778",
+    "mode": "ENCRYPT",
+    "in_hex": "0001020304050607",
+    "out_hex": "c998b29af1f5b5f6"
+  },
+  {
+    "key_hex": "6162636465666768696a6b6c6d6e6f707172737475767778",
+    "mode": "DECRYPT",
+    "in_hex": "0001020304050607",
+    "out_hex": "abc0e982d259ea59"
+  },
+  {
+    "key_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
+    "mode": "ENCRYPT",
+    "in_hex": "0000000000000000",
+    "out_hex": "9b2f350a71ab67d1"
+  },
+  {
+    "key_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
+    "mode": "DECRYPT",
+    "in_hex": "0000000000000000",
+    "out_hex": "32c26ad0e6e3f037"
+  },
+  {
+    "key_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
+    "mode": "ENCRYPT",
+    "in_hex": "ffffffffffffffff",
+    "out_hex": "8d987eef5ad3a592"
+  },
+  {
+    "key_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
+    "mode": "DECRYPT",
+    "in_hex": "ffffffffffffffff",
+    "out_hex": "f7cad9b3b2f1b2d4"
+  },
+  {
+    "key_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
+    "mode": "ENCRYPT",
+    "in_hex": "3031323334353637",
+    "out_hex": "960bd831ffe10003"
+  },
+  {
+    "key_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
+    "mode": "DECRYPT",
+    "in_hex": "3031323334353637",
+    "out_hex": "3d7b92cbc0ed51dd"
+  },
+  {
+    "key_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
+    "mode": "ENCRYPT",
+    "in_hex": "4142434445464748",
+    "out_hex": "c508de8be32fea1d"
+  },
+  {
+    "key_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
+    "mode": "DECRYPT",
+    "in_hex": "4142434445464748",
+    "out_hex": "59c807a2a32d26db"
+  },
+  {
+    "key_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
+    "mode": "ENCRYPT",
+    "in_hex": "0001020304050607",
+    "out_hex": "3be76544ad6f8a74"
+  },
+  {
+    "key_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
+    "mode": "DECRYPT",
+    "in_hex": "0001020304050607",
+    "out_hex": "cef1bdc97ba93524"
+  }
+]

@@ -1,0 +1,170 @@
+syntax = "proto3";
+
+package musicgw.pool.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/MiChongs/QQMusicApi/gateway/internal/genproto/musicgw/pool/v1;poolv1";
+
+// PoolService 凭证池管理。
+//
+// Acquire / Release 是热路径，仅内部 gRPC，不出 REST（v0.4 远程化）。
+// Add/Remove/HealthSummary 是管理面，自动出 REST：/v1/admin/pool/*。
+// 这些路径在 Edge Gateway 应被 admin auth middleware 保护（mTLS 客户端证书 /
+// admin API key），具体策略由部署方实现。
+service PoolService {
+  rpc Acquire(AcquireRequest) returns (CredentialLease);
+  rpc Release(ReleaseRequest) returns (google.protobuf.Empty);
+
+  rpc AddCredential(AddCredentialRequest) returns (Credential) {
+    option (google.api.http) = {
+      post: "/v1/admin/pool/credentials"
+      body: "*"
+    };
+  }
+  rpc RemoveCredential(RemoveCredentialRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/admin/pool/credentials/{id}"
+    };
+  }
+  rpc HealthSummary(HealthSummaryRequest) returns (PoolHealth) {
+    option (google.api.http) = {
+      get: "/v1/admin/pool/health/{provider}"
+    };
+  }
+  rpc ListCredentials(ListCredentialsRequest) returns (ListCredentialsResponse) {
+    option (google.api.http) = {
+      get: "/v1/admin/pool/credentials"
+    };
+  }
+  rpc SetCredentialStatus(SetCredentialStatusRequest) returns (Credential) {
+    option (google.api.http) = {
+      patch: "/v1/admin/pool/credentials/{id}/status"
+      body: "*"
+    };
+  }
+  rpc RefreshCredential(RefreshCredentialRequest) returns (Credential) {
+    option (google.api.http) = {
+      post: "/v1/admin/pool/credentials/{id}/refresh"
+      body: "*"
+    };
+  }
+  rpc TestCredential(TestCredentialRequest) returns (TestCredentialResponse) {
+    option (google.api.http) = {
+      post: "/v1/admin/pool/credentials/{id}/test"
+      body: "*"
+    };
+  }
+}
+
+message AcquireRequest {
+  string provider = 1;
+  string capability = 2;     // 对应 Capability enum 字符串名
+  string user_id = 3;        // 可选：用于 sticky 路由
+}
+
+message CredentialLease {
+  string lease_id = 1;
+  string credential_id = 2;
+  string provider = 3;
+  bytes payload = 4;          // 已解密的凭证 payload（lease 释放后清零）
+  google.protobuf.Timestamp expires_at = 5;
+}
+
+enum PoolResult {
+  POOL_RESULT_UNSPECIFIED = 0;
+  POOL_RESULT_OK = 1;
+  POOL_RESULT_RATE_LIMITED = 2;
+  POOL_RESULT_AUTH_FAILED = 3;
+  POOL_RESULT_NETWORK_ERROR = 4;
+}
+
+message ReleaseRequest {
+  string lease_id = 1;
+  PoolResult result = 2;
+  int32 latency_ms = 3;
+  string error = 4;
+}
+
+message AddCredentialRequest {
+  string provider = 1;
+  string label = 2;
+  bytes payload = 3;          // 明文凭证（服务端 AES-256-GCM 加密后入库）
+  repeated string capabilities = 4;
+}
+
+message Credential {
+  string id = 1;
+  string provider = 2;
+  string label = 3;
+  string status = 4;
+  double health_score = 5;
+  google.protobuf.Timestamp last_used_at = 6;
+  google.protobuf.Timestamp last_failed_at = 7;
+  int32 fail_count = 8;
+  google.protobuf.Timestamp cooldown_until = 9;
+  repeated string capabilities = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp expires_at = 12; // 凭据过期时间（从 payload 的 musickey_create_time + key_expires_in 计算）
+}
+
+message RefreshCredentialRequest {
+  string id = 1;
+}
+
+message RemoveCredentialRequest {
+  string id = 1;
+}
+
+message HealthSummaryRequest {
+  string provider = 1;        // 空表示所有
+}
+
+// ListCredentialsRequest 列出指定 provider 的所有凭证（管理面）。
+//
+// 当 provider 为空时返回所有 provider 的凭证集合。status_filter 可选：
+//   "" -> 所有状态；"active" -> 仅 active；"disabled" -> 仅 disabled。
+message ListCredentialsRequest {
+  string provider = 1;
+  string status_filter = 2;
+  int32 limit = 3;            // 默认 100，最大 500
+  int32 offset = 4;           // 配合分页
+}
+
+message ListCredentialsResponse {
+  repeated Credential items = 1;
+  int32 total = 2;
+}
+
+// SetCredentialStatusRequest 切换单个凭证的状态（active / disabled）。
+//
+// 不接受 banned —— banned 是 healthworker 熔断保护使用，人工干预改用 disabled。
+message SetCredentialStatusRequest {
+  string id = 1;
+  string status = 2;          // "active" / "disabled"
+}
+message PoolHealth {
+  repeated ProviderPool pools = 1;
+}
+message ProviderPool {
+  string provider = 1;
+  int32 active = 2;
+  int32 disabled = 3;
+  int32 banned = 4;
+  int32 in_cooldown = 5;
+  double avg_health_score = 6;
+}
+
+message TestCredentialRequest {
+  string id = 1;
+  string capability = 2; // GetSong / SearchSongs / GetSongURL / GetLyric / HealthCheck 等
+}
+
+message TestCredentialResponse {
+  bool success = 1;
+  string capability = 2;
+  int32 latency_ms = 3;
+  string error = 4;
+}

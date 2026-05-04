@@ -1,0 +1,32 @@
+version: v2
+managed:
+  enabled: true
+plugins:
+  # 本地 protoc-gen-* 插件（避免 BSR remote 网络抖动）。
+  # tools 目标：make tools 一次性安装到 $GOPATH/bin。
+  #
+  # 不用 paths=source_relative：所有 .proto 在 v1/ 一个目录里但 go_package 各异，
+  # 默认 import 模式会按 go_package 选项中的路径分别落到子目录（与 go module
+  # import path 一致）。内置删除前缀 github.com/MiChongs/QQMusicApi/gateway/。
+  - local: protoc-gen-go
+    out: ../../..
+    opt:
+      - module=github.com/MiChongs/QQMusicApi/gateway
+  - local: protoc-gen-go-grpc
+    out: ../../..
+    opt:
+      - module=github.com/MiChongs/QQMusicApi/gateway
+      - require_unimplemented_servers=true
+  - local: protoc-gen-grpc-gateway
+    out: ../../..
+    opt:
+      - module=github.com/MiChongs/QQMusicApi/gateway
+      - generate_unbound_methods=true
+  - local: protoc-gen-openapiv2
+    out: ../../../api/openapi
+    opt:
+      - allow_merge=true
+      - merge_file_name=music-gateway
+      - openapi_naming_strategy=fqn
+inputs:
+  - directory: .

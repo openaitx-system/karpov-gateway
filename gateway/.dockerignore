@@ -1,0 +1,30 @@
+# Windows-built artifacts (上次开发时生成的)
+*.exe
+gateway.exe
+pool.exe
+
+# 测试产物 / 数据
+*.test
+sonobat.db
+*.db
+data/
+deploy/
+
+# 工具配置
+.git
+.github
+.idea
+.vscode
+*.log
+
+# 文档
+docs/
+README.md
+CHANGELOG.md
+SECURITY.md
+LICENSING.md
+*.md
+
+# 编辑器临时
+.DS_Store
+Thumbs.db

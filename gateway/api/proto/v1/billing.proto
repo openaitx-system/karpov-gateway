@@ -1,0 +1,130 @@
+syntax = "proto3";
+
+package musicgw.billing.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/MiChongs/QQMusicApi/gateway/internal/genproto/musicgw/billing/v1;billingv1";
+
+// BillingService 套餐/订阅/订单/支付。
+service BillingService {
+  rpc ListPlans(ListPlansRequest) returns (PlanList) {
+    option (google.api.http) = { get: "/v1/billing/plans" };
+  }
+  rpc Subscribe(SubscribeRequest) returns (SubscribeResponse) {
+    option (google.api.http) = { post: "/v1/billing/subscribe" body: "*" };
+  }
+  rpc CancelSubscription(CancelSubscriptionRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = { post: "/v1/billing/subscription/cancel" body: "*" };
+  }
+  rpc CreateOrder(CreateOrderRequest) returns (Order) {
+    option (google.api.http) = { post: "/v1/billing/orders" body: "*" };
+  }
+  rpc GetOrder(GetOrderRequest) returns (Order) {
+    option (google.api.http) = { get: "/v1/billing/orders/{id}" };
+  }
+  rpc ListInvoices(ListInvoicesRequest) returns (InvoiceList) {
+    option (google.api.http) = { get: "/v1/billing/invoices" };
+  }
+
+  // 支付回调由 Edge Gateway 接收 → 转发到此 RPC。
+  // 各 provider 字段差异在 Edge 适配后归一。
+  rpc PaymentCallback(PaymentCallbackRequest) returns (PaymentCallbackResult);
+}
+
+// ---------- Plans / Subscription ----------
+
+message ListPlansRequest {}
+message PlanList { repeated Plan items = 1; }
+message Plan {
+  string id = 1;
+  string code = 2;            // free / pro / enterprise / payg
+  string name = 3;
+  int64 price_cents = 4;      // 月费（按量付费套餐为 0）
+  string currency = 5;
+  string period = 6;          // monthly / yearly
+  int32 qps = 7;
+  int32 soft_limit_pct = 8;
+  int64 daily_limit = 9;      // 日限额
+  int64 monthly_limit = 10;   // 月限额
+  bool pay_as_you_go = 11;    // 是否支持按量计费（超额部分按次收费）
+  int64 overage_price_per_1k = 12; // 超额每千次价格（分），0=不允许超额
+}
+
+message SubscribeRequest {
+  string plan_code = 1;
+  string payment_provider = 2;     // yipay / hupijiao
+  string success_url = 3;
+  string cancel_url = 4;
+}
+message SubscribeResponse {
+  string order_id = 1;
+  string redirect_url = 2;       // 跳转支付页
+  string qrcode_payload = 3;     // 或二维码内容
+}
+
+message CancelSubscriptionRequest {}
+
+// ---------- Orders / Invoices ----------
+
+enum OrderStatus {
+  ORDER_STATUS_UNSPECIFIED = 0;
+  ORDER_STATUS_PENDING = 1;
+  ORDER_STATUS_PAYING = 2;
+  ORDER_STATUS_PAID = 3;
+  ORDER_STATUS_COMPLETED = 4;
+  ORDER_STATUS_FAILED = 5;
+  ORDER_STATUS_EXPIRED = 6;
+  ORDER_STATUS_CANCELED = 7;
+}
+
+message CreateOrderRequest {
+  string plan_code = 1;
+  string payment_provider = 2;
+  string idempotency_key = 3;    // 客户端传入，UNIQUE
+}
+
+message Order {
+  string id = 1;
+  string user_id = 2;
+  string plan_id = 3;
+  int64 amount_cents = 4;
+  string currency = 5;
+  OrderStatus status = 6;
+  string payment_provider = 7;
+  string external_order_id = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp paid_at = 10;
+  google.protobuf.Timestamp expires_at = 11;
+}
+
+message GetOrderRequest { string id = 1; }
+
+message ListInvoicesRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+message InvoiceList { repeated Invoice items = 1; int32 total = 2; }
+message Invoice {
+  string id = 1;
+  string order_id = 2;
+  string pdf_url = 3;
+  google.protobuf.Timestamp issued_at = 4;
+}
+
+// ---------- Payment Callback (内部) ----------
+
+message PaymentCallbackRequest {
+  string provider = 1;          // yipay / hupijiao
+  bytes raw_body = 2;
+  map<string, string> headers = 3;
+  string client_ip = 4;
+}
+
+message PaymentCallbackResult {
+  bool accepted = 1;
+  string order_id = 2;
+  string reason = 3;
+}

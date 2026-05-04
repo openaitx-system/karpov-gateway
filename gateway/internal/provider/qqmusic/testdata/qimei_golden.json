@@ -1,0 +1,138 @@
+[
+  {
+    "kind": "aes_cbc_pkcs7_iv_eq_key",
+    "key_ascii": "0123456789abcdef",
+    "plaintext_hex": "",
+    "ciphertext_hex": "ed47fee0545c3fa7dd070d44b86e98d9"
+  },
+  {
+    "kind": "aes_cbc_pkcs7_iv_eq_key",
+    "key_ascii": "0123456789abcdef",
+    "plaintext_hex": "68656c6c6f",
+    "ciphertext_hex": "30e7cbb71cd9d18812e3ee5c3f294563"
+  },
+  {
+    "kind": "aes_cbc_pkcs7_iv_eq_key",
+    "key_ascii": "0123456789abcdef",
+    "plaintext_hex": "616161616161616161616161616161",
+    "ciphertext_hex": "bbc2d4b208468241be063bc82f204d60"
+  },
+  {
+    "kind": "aes_cbc_pkcs7_iv_eq_key",
+    "key_ascii": "0123456789abcdef",
+    "plaintext_hex": "61616161616161616161616161616161",
+    "ciphertext_hex": "f38af0171a3dc8ff3cfde040b3048fe8e2bf15d316e0e0ec66d09c2f4fd50997"
+  },
+  {
+    "kind": "aes_cbc_pkcs7_iv_eq_key",
+    "key_ascii": "0123456789abcdef",
+    "plaintext_hex": "6161616161616161616161616161616161",
+    "ciphertext_hex": "f38af0171a3dc8ff3cfde040b3048fe8cb0baa4dee18e866f58f6c64804aeb4c"
+  },
+  {
+    "kind": "aes_cbc_pkcs7_iv_eq_key",
+    "key_ascii": "fedcba9876543210",
+    "plaintext_hex": "74686520717569636b2062726f776e20666f78206a756d7073206f76657220746865206c617a7920646f67",
+    "ciphertext_hex": "ff9cc7509e592f7503c105d9b5f797a5d12317709fc976a16149b63a29a3fe1a08af7605892a9d9b323c0f2ff55d1b46"
+  },
+  {
+    "kind": "aes_cbc_pkcs7_iv_eq_key",
+    "key_ascii": "68d2301028fb66b5",
+    "plaintext_hex": "7cf7bc566f0b6ed748",
+    "ciphertext_hex": "8e0c75ffde3522eb904026a7aa52753d"
+  },
+  {
+    "kind": "aes_cbc_pkcs7_iv_eq_key",
+    "key_ascii": "9111f1af067e3430",
+    "plaintext_hex": "1580b9b53075af099c3415bd732dadb6c7fbd8b1200cafbcd63e2ed8733d48a72856becfbb972254ff79985eb4729ad4bd788b78436ca1",
+    "ciphertext_hex": "d761b30666009ae2b8526b73606030433f43426980078a6e0bc7bfb658aca24b77224e47597d52c5d71019a617429f55af2caa35a399139a18ea41f78c00256e"
+  },
+  {
+    "kind": "aes_cbc_pkcs7_iv_eq_key",
+    "key_ascii": "7c27fbf9fb40e998",
+    "plaintext_hex": "8c65a2fe0611c4f12c3f4f5bcc1d4090b0bdf432855a8f677b858c1c58c4665ca6ca1257",
+    "ciphertext_hex": "4e3ae68218dd4cdf8ececb27c2044564703818136886d20d844a66b8316768da5544dfee48c82b48feda6d99f92b958e"
+  },
+  {
+    "kind": "aes_cbc_pkcs7_iv_eq_key",
+    "key_ascii": "13bfca72eb0ae116",
+    "plaintext_hex": "1d3930b0333d118685af60a0939ba0ad851e5031a9db",
+    "ciphertext_hex": "4d3e15928a39a39bbb0b42185e47c39e935b54725a9c50ccb72fb6823b88b187"
+  },
+  {
+    "kind": "aes_cbc_pkcs7_iv_eq_key",
+    "key_ascii": "dd4f418d9874468f",
+    "plaintext_hex": "60ed405109bd8c4021",
+    "ciphertext_hex": "b05c0a1c78948d39692d60dc45e3d441"
+  },
+  {
+    "kind": "aes_cbc_pkcs7_iv_eq_key",
+    "key_ascii": "fa17ae1ec48d3b81",
+    "plaintext_hex": "be743bdd85c19569af0623b19c3dba2349cf3afd943e9ff12497df736c5e0540b521",
+    "ciphertext_hex": "e56b19271b6bc4445d79c0d46275f67797418cf3e920b0c82432a49346a0d9252cc800323a4d80e3547529a309c3f010"
+  },
+  {
+    "kind": "aes_cbc_pkcs7_iv_eq_key",
+    "key_ascii": "398557e1efac6fba",
+    "plaintext_hex": "17523f381b757e381bdb0728f31f06b1a2a3c8251c745cbc3fb450ff60544e01031271555d3bad4faa1e8a03450c2389f3eb7bb200103d369b",
+    "ciphertext_hex": "3cebe08651a5ad20799a03ecb7f818b2dfc1b3dc958823b74376357b52285dc88172cb61b3879f55cc4107699255bfb8e029f0b0e60954e76fd3ab5becd185bc"
+  },
+  {
+    "kind": "aes_cbc_pkcs7_iv_eq_key",
+    "key_ascii": "230168a42eaab595",
+    "plaintext_hex": "0cb52c043c86c008d7bfb1cb198da134e8aefd1de801e03188311f04d6dd722a81e84413",
+    "ciphertext_hex": "4e6596c97d063b5c746cf900feae94a7dfb184ed1ce52432c93e3629537d46e3b0b2c8d262953a04d3e1cc2dbdb7fd85"
+  },
+  {
+    "kind": "md5_chain",
+    "parts": [
+      "abc"
+    ],
+    "expected_hex": "900150983cd24fb0d6963f7d28e17f72"
+  },
+  {
+    "kind": "md5_chain",
+    "parts": [
+      "a",
+      "b",
+      "c"
+    ],
+    "expected_hex": "900150983cd24fb0d6963f7d28e17f72"
+  },
+  {
+    "kind": "md5_chain",
+    "parts": [
+      "qimei_qq_androidpzAuCmaFAaFaHrdakPjLIEqKrGnSOOvH",
+      "1700000000"
+    ],
+    "expected_hex": "e5b20b202fdb7288521634a7de434a9b"
+  },
+  {
+    "kind": "md5_chain",
+    "parts": [
+      "k",
+      "p",
+      "1700000000000",
+      "n",
+      "ZdJqM15EeO2zWc08",
+      "{\"appKey\":\"0AND0HD6FE4HY80F\"}"
+    ],
+    "expected_hex": "c7f045b4a56131bfcd7901a2956a9969"
+  },
+  {
+    "kind": "md5_chain",
+    "parts": [
+      ""
+    ],
+    "expected_hex": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  {
+    "kind": "md5_chain",
+    "parts": [
+      "你好",
+      "world",
+      "🎵"
+    ],
+    "expected_hex": "df958d32d775242f9ddc7ef5ea770a4b"
+  }
+]

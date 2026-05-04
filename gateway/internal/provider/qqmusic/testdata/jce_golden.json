@@ -1,0 +1,155 @@
+[
+  {
+    "kind": "request_basic",
+    "encoded_hex": "080003060263741602313106026376160731303033303036060375696e16013018000106057265715f301a06014d1601462a06026869102a2d00000201020b0b",
+    "comm": {
+      "ct": "11",
+      "cv": "1003006",
+      "uin": "0"
+    },
+    "items": [
+      {
+        "key": "req_0",
+        "module": "M",
+        "method": "F",
+        "param": [
+          {
+            "tag": 0,
+            "kind": "string",
+            "str": "hi"
+          },
+          {
+            "tag": 1,
+            "kind": "int",
+            "int": 42
+          },
+          {
+            "tag": 2,
+            "kind": "bytes",
+            "bytes_hex": "0102"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kind": "request_empty",
+    "encoded_hex": "080c180c",
+    "comm": {},
+    "items": []
+  },
+  {
+    "kind": "request_long_widths",
+    "encoded_hex": "08000106016b1601761800010601721a06016d1601662a070000012c616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161110100220001000033000000020000000040ff0b0b",
+    "comm": {
+      "k": "v"
+    },
+    "items": [
+      {
+        "key": "r",
+        "module": "m",
+        "method": "f",
+        "param": [
+          {
+            "tag": 0,
+            "kind": "string",
+            "str": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          {
+            "tag": 1,
+            "kind": "int",
+            "int": 256
+          },
+          {
+            "tag": 2,
+            "kind": "int",
+            "int": 65536
+          },
+          {
+            "tag": 3,
+            "kind": "int",
+            "int": 8589934592
+          },
+          {
+            "tag": 4,
+            "kind": "int",
+            "int": -1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kind": "request_multi",
+    "encoded_hex": "08000106017816017918000306057265715f301a06056d6f645f3016066d6574685f302a060476616c300b0b06057265715f311a06056d6f645f3116066d6574685f312a060476616c310b0b06057265715f321a06056d6f645f3216066d6574685f322a060476616c320b0b",
+    "comm": {
+      "x": "y"
+    },
+    "items": [
+      {
+        "key": "req_0",
+        "module": "mod_0",
+        "method": "meth_0",
+        "param": [
+          {
+            "tag": 0,
+            "kind": "string",
+            "str": "val0"
+          }
+        ]
+      },
+      {
+        "key": "req_1",
+        "module": "mod_1",
+        "method": "meth_1",
+        "param": [
+          {
+            "tag": 0,
+            "kind": "string",
+            "str": "val1"
+          }
+        ]
+      },
+      {
+        "key": "req_2",
+        "module": "mod_2",
+        "method": "meth_2",
+        "param": [
+          {
+            "tag": 0,
+            "kind": "string",
+            "str": "val2"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kind": "response_basic",
+    "encoded_hex": "0c18000106057273705f301a0c1a06026f6b1100c83d000002ffee0b0b",
+    "code": 0,
+    "items": [
+      {
+        "key": "rsp_0",
+        "code": 0,
+        "data": [
+          {
+            "tag": 0,
+            "kind": "string",
+            "str": "ok"
+          },
+          {
+            "tag": 1,
+            "kind": "int",
+            "int": 200
+          },
+          {
+            "tag": 3,
+            "kind": "bytes",
+            "bytes_hex": "ffee"
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,14 @@
+{{.AppName}} · {{.SubjectTitle}}
+
+{{.Greeting}}请在 {{.ExpiresMinutes}} 分钟内输入下方验证码完成验证：
+
+  {{.Code}}
+
+{{.ExpiresMinutes}} 分钟内有效。
+
+不是你本人发起的验证？忽略本邮件即可，账号不会受到任何影响。
+
+—
+系统自动邮件，请勿直接回复。
+{{if .SupportEmail}}如需协助：{{.SupportEmail}}
+{{end}}© {{.Year}} {{.AppName}}

@@ -1,0 +1,198 @@
+syntax = "proto3";
+
+package musicgw.music.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/MiChongs/QQMusicApi/gateway/internal/genproto/musicgw/music/v1;musicv1";
+
+// MusicService 提供跨 provider 的统一音乐查询能力。
+service MusicService {
+  rpc GetSong(GetSongRequest) returns (Song) {
+    option (google.api.http) = { get: "/v1/{provider}/songs/{id}" };
+  }
+  rpc SearchSongs(SearchSongsRequest) returns (SearchSongsResponse) {
+    option (google.api.http) = { get: "/v1/{provider}/search/songs" };
+  }
+  rpc GetSongURL(GetSongURLRequest) returns (SongURL) {
+    option (google.api.http) = { get: "/v1/{provider}/songs/{id}/url" };
+  }
+  rpc GetLyric(GetLyricRequest) returns (Lyric) {
+    option (google.api.http) = { get: "/v1/{provider}/songs/{id}/lyric" };
+  }
+  rpc GetAlbum(GetAlbumRequest) returns (Album) {
+    option (google.api.http) = { get: "/v1/{provider}/albums/{id}" };
+  }
+  rpc GetArtist(GetArtistRequest) returns (Artist) {
+    option (google.api.http) = { get: "/v1/{provider}/artists/{id}" };
+  }
+  rpc GetPlaylist(GetPlaylistRequest) returns (Playlist) {
+    option (google.api.http) = { get: "/v1/{provider}/playlists/{id}" };
+  }
+}
+
+// ---------- 请求/响应 ----------
+
+message GetSongRequest {
+  string provider = 1;
+  string id = 2;
+}
+
+message SearchSongsRequest {
+  string provider = 1;
+  string q = 2;
+  int32 page = 3;       // 1-based
+  int32 page_size = 4;  // 默认 20，上限 100
+}
+
+message SearchSongsResponse {
+  repeated Song items = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+message GetSongURLRequest {
+  string provider = 1;
+  string id = 2;
+  string quality = 3; // MP3_128/MP3_320/FLAC/MASTER/DOLBY 等，见 Quality enum 注释
+}
+
+message GetLyricRequest {
+  string provider = 1;
+  string id = 2;
+  bool include_translation = 3;
+}
+
+message GetAlbumRequest {
+  string provider = 1;
+  string id = 2;
+}
+
+message GetArtistRequest {
+  string provider = 1;
+  string id = 2;
+}
+
+message GetPlaylistRequest {
+  string provider = 1;
+  string id = 2;
+}
+
+// ---------- 领域模型 ----------
+
+enum Quality {
+  QUALITY_UNSPECIFIED = 0;
+  // MP3
+  QUALITY_MP3_128 = 1;       // M500 标准音质 128kbps
+  QUALITY_MP3_320 = 2;       // M800 HQ高品质 320kbps
+  // AAC
+  QUALITY_AAC_48 = 3;        // C200 低品质
+  QUALITY_AAC_96 = 4;        // C400 流畅音质
+  QUALITY_AAC_192 = 5;       // C600 HQ高品质
+  // OGG
+  QUALITY_OGG_96 = 6;        // O400 流畅音质
+  QUALITY_OGG_192 = 7;       // O600 HQ高品质
+  QUALITY_OGG_320 = 8;       // O800 HQ高品质
+  QUALITY_OGG_640 = 9;       // O801 SQ无损
+  // 无损
+  QUALITY_FLAC = 10;          // F000 SQ无损音质
+  // 臻品/母带/全景声
+  QUALITY_MASTER = 11;        // AI00 臻品母带
+  QUALITY_ATMOS_2 = 12;       // Q000 臻品音质
+  QUALITY_ATMOS_51 = 13;      // Q001 臻品全景声5.1
+  QUALITY_ATMOS_71 = 14;      // Q003 臻品全景声7.1
+  QUALITY_DOLBY = 15;         // D004 杜比全景声
+  QUALITY_DTS_X = 16;         // DT03 DTS:X
+  // 加密格式
+  QUALITY_MFLAC = 17;         // F0M0 加密无损
+  QUALITY_MOGG_320 = 18;      // O8M0 加密OGG320
+  QUALITY_MOGG_640 = 19;      // O8M1 加密OGG640
+  QUALITY_MMASTER = 20;       // AIM0 加密臻品母带
+}
+
+message Song {
+  string id = 1;
+  string provider = 2;
+  string title = 3;
+  repeated Artist artists = 4;
+  Album album = 5;
+  int32 duration_seconds = 6;
+  bool is_vip_only = 7;
+  bool playable = 8;
+  google.protobuf.Timestamp publish_date = 9;
+  map<string, string> ext = 100;  // provider 特有附加字段
+}
+
+message Artist {
+  string id = 1;
+  string provider = 2;
+  string name = 3;
+  string avatar_url = 4;
+  int64 fans_count = 5;
+  map<string, string> ext = 100;
+}
+
+message Album {
+  string id = 1;
+  string provider = 2;
+  string title = 3;
+  repeated Artist artists = 4;
+  string cover_url = 5;
+  google.protobuf.Timestamp publish_date = 6;
+  int32 song_count = 7;
+  map<string, string> ext = 100;
+}
+
+message Playlist {
+  string id = 1;
+  string provider = 2;
+  string title = 3;
+  string creator = 4;
+  string cover_url = 5;
+  int32 song_count = 6;
+  repeated Song songs = 7;
+  map<string, string> ext = 100;
+}
+
+message Lyric {
+  string id = 1;
+  string provider = 2;
+  string lrc = 3;
+  string trans = 4;
+  string roma = 5;
+}
+
+message SongURL {
+  // 歌曲信息
+  SongInfo song = 1;
+  // 音频资源
+  AudioResource audio = 2;
+  // 可用性
+  bool available = 3;
+  string unavailable_reason = 4;
+}
+
+message SongInfo {
+  string id = 1;
+  string provider = 2;
+  string title = 3;
+  string artist = 4;          // 多歌手以 " / " 分隔
+  string album = 5;
+  string cover = 6;           // 专辑封面
+  int32 duration_seconds = 7;
+  string publish_date = 8;
+  bool is_vip_only = 9;
+}
+
+message AudioResource {
+  string url = 1;
+  string quality = 2;         // 原始品质代码 MP3_320 / MASTER 等
+  string quality_label = 3;   // 人类可读 "臻品母带 Hi-Res"
+  string format = 4;          // flac / mp3 / ogg
+  int64 size_bytes = 5;
+  string size_label = 6;      // "174.8MB"
+  int32 expires_in_seconds = 7;
+  string expires_label = 8;   // "2小时"
+}

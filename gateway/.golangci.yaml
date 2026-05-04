@@ -1,0 +1,115 @@
+# golangci-lint v2 配置（schema v2.x）
+# 与 Plan §11.1 准入门槛对齐：linter 全绿；gosec/govulncheck 由独立工具运行。
+#
+# v2 关键变化（相对 v1）：
+#   - 顶层 `version: "2"` 必填
+#   - `disable-all: true` → `linters.default: none`
+#   - `linters-settings` 合并进 `linters.settings`
+#   - `issues.exclude-rules` → `linters.exclusions.rules`
+#   - gosimple / typecheck 移除（已并入 staticcheck / 自动校验）
+#   - gofmt / goimports 移出 linters → 顶层 `formatters`
+
+version: "2"
+
+run:
+  timeout: 5m
+  go: "1.26"
+  tests: true
+  modules-download-mode: readonly
+
+linters:
+  default: none
+  enable:
+    # 默认推荐
+    - errcheck     # 未处理 error
+    - govet        # vet 标准
+    - ineffassign  # 无效赋值
+    - staticcheck  # 标准静态检查（含 v1 gosimple/stylecheck）
+    - unused       # 未使用代码
+    # 额外加固
+    - misspell     # 拼写
+    - revive       # 替代 golint
+    - bodyclose    # http.Response.Body 必须 Close
+    - rowserrcheck # sql.Rows.Err 必须检查
+    - errorlint    # errors.Is/As 推荐
+    - gocritic     # 高级 lint
+    - prealloc     # slice 预分配
+    - unconvert    # 多余 convert
+    - unparam      # 未使用参数
+  settings:
+    errcheck:
+      check-type-assertions: true
+      check-blank: false
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment  # 不强制结构体字段对齐优化
+        - shadow          # 与 gocritic 重叠
+    revive:
+      severity: warning
+      rules:
+        - name: var-naming
+        - name: package-comments
+        - name: indent-error-flow
+        - name: error-return
+        - name: error-naming
+    gocritic:
+      enabled-tags:
+        - performance
+        - diagnostic
+        - style
+      disabled-checks:
+        - ifElseChain
+        - hugeParam
+        - paramTypeCombine
+    staticcheck:
+      checks:
+        - all
+        # ST1000: 包名注释不强制（internal/* 已在 exclusion 中放过）
+        - "-ST1000"
+  exclusions:
+    presets:
+      - common-false-positives
+    rules:
+      # 测试代码可以放宽
+      - path: _test\.go
+        linters:
+          - errcheck
+          - prealloc
+          - gocritic
+          - unparam
+      # 自动生成的 protobuf / grpc-gateway 代码不参与 lint
+      - path: internal/genproto/
+        linters:
+          - errcheck
+          - govet
+          - ineffassign
+          - staticcheck
+          - unused
+          - misspell
+          - revive
+          - bodyclose
+          - rowserrcheck
+          - errorlint
+          - gocritic
+          - prealloc
+          - unconvert
+          - unparam
+      # 内部包未导出 helper 不强制 package 注释
+      - path: internal/
+        linters:
+          - revive
+        text: "package-comments"
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/MiChongs/QQMusicApi/gateway
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

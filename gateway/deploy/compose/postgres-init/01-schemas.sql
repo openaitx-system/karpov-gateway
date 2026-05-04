@@ -1,0 +1,5 @@
+-- 初始化 4 个业务 schema（按 service 隔离）
+CREATE SCHEMA IF NOT EXISTS auth;
+CREATE SCHEMA IF NOT EXISTS quota;
+CREATE SCHEMA IF NOT EXISTS billing;
+CREATE SCHEMA IF NOT EXISTS pool;

@@ -1,0 +1,13 @@
+{{.AppName}} · 激活账号
+
+{{.UserDisplay}}，刚才你创建了一个 {{.AppName}} 账号。
+打开下方链接完成邮箱激活（{{.ExpiresHours}} 小时内有效）：
+
+  {{.ActivateURL}}
+
+不是你本人操作？忽略本邮件即可，未激活的账号 {{.ExpiresHours}} 小时后自动作废。
+
+—
+系统自动邮件，请勿直接回复。
+{{if .SupportEmail}}如需协助：{{.SupportEmail}}
+{{end}}© {{.Year}} {{.AppName}}

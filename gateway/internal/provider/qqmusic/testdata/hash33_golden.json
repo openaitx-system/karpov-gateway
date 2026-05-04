@@ -1,0 +1,152 @@
+[
+  {
+    "s": "",
+    "h": 0,
+    "expected": 0
+  },
+  {
+    "s": "a",
+    "h": 0,
+    "expected": 97
+  },
+  {
+    "s": "abc",
+    "h": 0,
+    "expected": 108966
+  },
+  {
+    "s": "QQMusicApi",
+    "h": 0,
+    "expected": 1959211709
+  },
+  {
+    "s": "0123456789",
+    "h": 0,
+    "expected": 95184653
+  },
+  {
+    "s": "你好",
+    "h": 0,
+    "expected": 693469
+  },
+  {
+    "s": "🎵",
+    "h": 0,
+    "expected": 127925
+  },
+  {
+    "s": "",
+    "h": 5381,
+    "expected": 5381
+  },
+  {
+    "s": "a",
+    "h": 5381,
+    "expected": 177670
+  },
+  {
+    "s": "abc",
+    "h": 5381,
+    "expected": 193485963
+  },
+  {
+    "s": "QQMusicApi",
+    "h": 5381,
+    "expected": 712315394
+  },
+  {
+    "s": "0123456789",
+    "h": 5381,
+    "expected": 995771986
+  },
+  {
+    "s": "你好",
+    "h": 5381,
+    "expected": 6553378
+  },
+  {
+    "s": "🎵",
+    "h": 5381,
+    "expected": 305498
+  },
+  {
+    "s": "U^@*FK\")]!.D/Gs$o(1B~3;{V)nT2y'$6I",
+    "h": 1081743298,
+    "expected": 196997151
+  },
+  {
+    "s": "|H,T+\"JHQyctdp}oyr@kt'_O:L3p\"?_{oVE:UQP2jZf+g",
+    "h": 1651062066,
+    "expected": 311525953
+  },
+  {
+    "s": "an#oetp",
+    "h": 1238941402,
+    "expected": 17216676
+  },
+  {
+    "s": "F57!oC&S- oi{NoCZX9JB?rpbt<_#3\"lA],6n;(+",
+    "h": 277747868,
+    "expected": 1100245763
+  },
+  {
+    "s": "Rm4*uytzYQsCPSP4",
+    "h": 129130855,
+    "expected": 477075015
+  },
+  {
+    "s": "IkrxU=INX",
+    "h": 926819132,
+    "expected": 2110696027
+  },
+  {
+    "s": "bdz wTk$q[sku'=i=<'&*oOhsDHYcxPk&{St[Ph%Q?P'*NyB*f",
+    "h": 634738271,
+    "expected": 231852563
+  },
+  {
+    "s": "I<!TI1u(knTmj,tdu1p?*|!0sGCrufp2oh~KSiAP<\":/,d%^&",
+    "h": 1768661489,
+    "expected": 497028303
+  },
+  {
+    "s": "JXp`ABB!UN0]dD>~,5tmZc[-*i`UL8bK2T/b_q3x~T8",
+    "h": 1694482448,
+    "expected": 176713880
+  },
+  {
+    "s": "@or\"M$->kr_czXL1N%K|Ei",
+    "h": 809418994,
+    "expected": 803645799
+  },
+  {
+    "s": "eF%D\\qbdm6KjoDV,64-w",
+    "h": 1689238275,
+    "expected": 445600453
+  },
+  {
+    "s": "~CD-6UO2oYyXPoaz}P2_,C/B+FB)3\"d7qD\"$*x} W>YlT7``",
+    "h": 1192448487,
+    "expected": 1188346305
+  },
+  {
+    "s": "_rv'F8UZ_d.sl5[KLyO8KRx8D<1s0 1Yw}B\\vdnMC-*g;",
+    "h": 1599088842,
+    "expected": 983145962
+  },
+  {
+    "s": "sY@>7Wh<hVa80~G@wFO _ub\"6v[`#K:tKaA+=^;{zh",
+    "h": 1965098298,
+    "expected": 1592544436
+  },
+  {
+    "s": "wFe{6<js4h5_q1=Dm\\]YPF`hTW=PA",
+    "h": 18977470,
+    "expected": 1853852691
+  },
+  {
+    "s": "ed\\q'^?Hq|cct_Uw7LWK=~#U<S-b#yn8@pnPMX=Dg`v\\C;2|wL<.@HI#",
+    "h": 560460799,
+    "expected": 98080613
+  }
+]

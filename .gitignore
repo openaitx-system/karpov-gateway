@@ -1,0 +1,80 @@
+# ================================================================
+# Karpov Gateway — .gitignore
+# ================================================================
+
+# ---- Secrets / runtime ----
+.env
+.env.local
+.env.*.local
+*.kek
+data/.kek
+data/users.json
+data/logs/
+*.sqlite
+*.sqlite-*
+*.db
+gateway/data/
+deploy/data/
+
+# ---- Go ----
+gateway/bin/
+gateway/coverage.txt
+gateway/coverage.out
+gateway/*.test
+gateway/*.exe
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.out
+*.pprof
+
+# ---- Web (Next.js) ----
+web/node_modules/
+web/.next/
+web/.turbo/
+web/out/
+web/build/
+web/dist/
+web/coverage/
+web/*.tsbuildinfo
+web/tsconfig.tsbuildinfo
+web/.vercel
+web/.env*.local
+
+# ---- pnpm / npm / yarn ----
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---- IDE / editors ----
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ---- Logs ----
+*.log
+logs/
+
+# ---- Docker volumes (本地 compose 持久化) ----
+deploy/compose/data/
+deploy/compose-prod/data/
+deploy/compose/postgres-data/
+deploy/compose-prod/postgres-data/
+deploy/compose/redis-data/
+deploy/compose-prod/redis-data/
+deploy/compose/pgadmin-data/
+deploy/compose-prod/pgadmin-data/
+
+# ---- Misc ----
+*.bak
+*.tmp
+.cache/
+sonobat.db

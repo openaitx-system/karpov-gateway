@@ -1,0 +1,242 @@
+[
+  {
+    "digest": "0000000000000000000000000000000000000000",
+    "expected": "zzc0000000wsezltpsovyxnlp7eedyhyhebm00000000"
+  },
+  {
+    "digest": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+    "expected": "zzcfffffffpthmaswtxqnoy0weh78nenbehkwffffffff"
+  },
+  {
+    "digest": "0123456789ABCDEF0123456789ABCDEF01234567",
+    "expected": "zzc7e64073wat28vp59xowf8c8esao6cpnq010c3b85"
+  },
+  {
+    "digest": "757415702B3995A91A67BC32967DE71F8138584D",
+    "expected": "zzc2a75107lfom5vfrr1wruwzj7j0vmg6zif415897d25"
+  },
+  {
+    "digest": "4E8EAA9D23C18D5AB58C269CF3C601B08026427B",
+    "expected": "zzcc594bdcf6kzcmtt6yeujzni4bznqho8gbe88c62a"
+  },
+  {
+    "digest": "BF21A9E8FBC5A3846FB05B4FA0859E0917B2202F",
+    "expected": "zzcf8e26805gyafigxmxjehoe02mvsjjgtwzw6f1a05f9"
+  },
+  {
+    "digest": "C116E40F23B854E322AA647852F614CCE5993B98",
+    "expected": "zzc8e032famdfxmfnqbhtnt4dkrbmswo4qis21e5a624"
+  },
+  {
+    "digest": "A9993E364706816ABA3E25717850C26C9CD0D89D",
+    "expected": "zzc163db6e8l6noj1uu5ylcp8kabaw6rnxos4b998e04e"
+  },
+  {
+    "digest": "3B333849B98BFADF5EC70AF2575666968BF2C2A2",
+    "expected": "zzc2d4c597yhsl32pzwcpv87cjlxauewrtuxe5b8f76b8"
+  },
+  {
+    "digest": "43AB806FFDEDE5AB738ABCBEB90082D9F47A803A",
+    "expected": "zzcea687fagowzse31fcvgbfwubwxhvbyk73fea0f0"
+  },
+  {
+    "digest": "5A312E08949B1B1F6C5E2233C2272262A6892F9F",
+    "expected": "zzc310268eaxadnk7jiepdaphiumfq5ykoviw6aa1e79e"
+  },
+  {
+    "digest": "7528928B5FF063DE4188BFCE8433F7D432B40A3F",
+    "expected": "zzced804b8la8hhywiwslwvaw1hmfub0vc4w45368352"
+  },
+  {
+    "digest": "FC6D40A0719752DEB23C03569201BD7E8E70D04F",
+    "expected": "zzc6dadb0cpurznqvfacidclkt6kfpwhrqfwbc85c170"
+  },
+  {
+    "digest": "AEB8AE50D63A81131A26A292D9902572F91FFE39",
+    "expected": "zzc215f106958dxgxourehjpoddx93ah4o1ef860de"
+  },
+  {
+    "digest": "1040E52B6E8EF9A027DFA227DE7ED58D1B6F218F",
+    "expected": "zzc7a222bfswdwvbtcw1yw6xhcpj4ncjtowdw201ffe65"
+  },
+  {
+    "digest": "C83F77D92F45ED73EAAF56C263874FF0C1290765",
+    "expected": "zzc27d0e9fkrjetux149bmy5g8e9du6iftye8cef727"
+  },
+  {
+    "digest": "DE37B691DD3B0AC5F03BF0A3180F0AE6610D10AA",
+    "expected": "zzc3c91f1bhxafbwdpmdlbd0ryye4y6sarkfe60bfd6"
+  },
+  {
+    "digest": "8CC623E4DEFABE46FE5CE3DA21CA70A0FF670887",
+    "expected": "zzca4e0f4c1egqcgsohlppafmhwyqcjxdgctqfcfbcad3"
+  },
+  {
+    "digest": "07E2146426EE8A53D83778069998C0C8AA694F7D",
+    "expected": "zzc6564d47xswn8vy8sk9pa8j94dgytsxins4d7a87824"
+  },
+  {
+    "digest": "7C28831A63657F673F4AC89C00F52EB8F1DF976F",
+    "expected": "zzcc6193aajq8wjlk3rzuofnlnelxcpx57tw3cf7a563"
+  },
+  {
+    "digest": "949F9C5512EC77F0E4313AE4004ECDDF10C07E8C",
+    "expected": "zzc4f57e51zbgvw8itqxvbycfea4wp9hbz8e4171e1c"
+  },
+  {
+    "digest": "2A2D287A7C4E298FBBEAB3691F4CA0EB3F77561F",
+    "expected": "zzc9875baacwqb7kyce3mk3gkszwxsbrdwl6wba32ac78"
+  },
+  {
+    "digest": "BAA5D6F544CDBDF0278EED203B7AC953F6462368",
+    "expected": "zzc0ff225e44jly56fhwywuldbqzo71nnnwts2afbea46"
+  },
+  {
+    "digest": "7505D939BCEF5D03979700AD9B0D4D401489FBA4",
+    "expected": "zzcd03f997lcjqr2a9z8mo7rw402xzsoghc95157db9"
+  },
+  {
+    "digest": "1FB205273405399D54555455E5ABB41946DC425C",
+    "expected": "zzc5924575rpw2se5xa2hlye4unetgnml9o85f435b35"
+  },
+  {
+    "digest": "44A7BC9AE22759AC81FC47D2FABE1B634EC5575A",
+    "expected": "zzc2a958achyapddh1y1awyp2pgv7p5sfkluk8445ceec"
+  },
+  {
+    "digest": "A6F0CF91B0DBAD0814D134FFF6D5EFB77FC38A46",
+    "expected": "zzcf0981119d8b2qjlsl5y6ejpudmvbi8u167a15bf"
+  },
+  {
+    "digest": "975D980728B1292FD905998AFCAEA7861CB013A9",
+    "expected": "zzca201d75znorkflje9nomspxho5va5mrahod7125e28"
+  },
+  {
+    "digest": "317BA846F47B07E00D840A2E95502D5F20477209",
+    "expected": "zzcee47064afwb0c4ppry8slbv7rdf2qmc7o012040f8"
+  },
+  {
+    "digest": "17D73F661B320938BE0E8DD7D3ED0EF75D46A8CA",
+    "expected": "zzc736ab6etvcm8mfgm8qpojesq638ctln0xkb750ed1f"
+  },
+  {
+    "digest": "2F553E72629C2603039846CC5A27AC7AAD7D5F44",
+    "expected": "zzcc075028dnkn5ljohpyrpy3imdeylcjvc0fa2876e"
+  },
+  {
+    "digest": "DE4833568A72C00BC87373117A16FA95DB12E88B",
+    "expected": "zzc105ec63h2awfagvd5r8lqalyiefszktgcedc3683"
+  },
+  {
+    "digest": "A17832E67720859F1AD30BFF7496DDFFD5D08D16",
+    "expected": "zzcf9e8163fbck1yv2or57gednyvelpx9ku11d83672"
+  },
+  {
+    "digest": "B53C4D8CFD82280CBA7D5CAA4B2A5041DA8751E2",
+    "expected": "zzca085bcd7bvgifqevalsebrm2qixfumkfeb5d2dafd"
+  },
+  {
+    "digest": "633B4BCBDE2E207FFC862462A9839758F7D9225A",
+    "expected": "zzc27c2fb6ohz4xqr8gonnsp4z0cnl3xh4wkf3f263db"
+  },
+  {
+    "digest": "968FE21CC3DD6B4A10075FBCD04FA5BDE565F73D",
+    "expected": "zzcc41f1c7z6hrihmpubahmxhqa9xogrejo416e67fc2"
+  },
+  {
+    "digest": "136FE07664920D5B1FE279B49FCCD05297776AFB",
+    "expected": "zzc4576162skht4l7an6eu1spp54wi1xjwe0g13902c60"
+  },
+  {
+    "digest": "02C6F49497EF72A61D5D4BD7D76A01DAA5409A62",
+    "expected": "zzc7a9914dwfhak29sfqsafgsryrzxyrh49e12a7da94"
+  },
+  {
+    "digest": "EC68848621F4776B42545AACEF7C962D49FAD9CB",
+    "expected": "zzcc68d464tu83epumtzfzyodxlzxkqmzbohg4c474c24"
+  },
+  {
+    "digest": "59588AC5E6D7402251203AB550864CBC0ABD6347",
+    "expected": "zzc52c6550ah85uzyfet7gfidokmaoyucgvq590406ea"
+  },
+  {
+    "digest": "3FB760E0081125D833C36EC1B7F15FE3388FFC6F",
+    "expected": "zzc1def303zpdtdtjdhysc99s6z7gtzrcuhdw3f323100"
+  },
+  {
+    "digest": "D0099B409270124ED50B867AB76EDE2F4329B525",
+    "expected": "zzca44bd0bis4o1kgikljkpzwbzy4sqsyizjyd041be9b"
+  },
+  {
+    "digest": "3E7FC9D8B466B86BC580D449B983BA8AB96F26F7",
+    "expected": "zzc96d2c80z1h6tm40gpd0tg4ywcnidzbox0qcebb03b9"
+  },
+  {
+    "digest": "DD4160B505D250B36C8331542BC4EA4BEBD10B8F",
+    "expected": "zzc4bb0653hgbti9aakdt4svu4qyzmrwcjw6de53400"
+  },
+  {
+    "digest": "BFFAACA360FAB293DF8B2E323BEC0366863AC7E5",
+    "expected": "zzc29acd3b5t0fnbqoig9uv5rjq6zx4wmbvlydf8bbc6c"
+  },
+  {
+    "digest": "F7039D99BF09DC87C697D7791A221458CC8CD969",
+    "expected": "zzc989dc97riqud2vb5nt3o20cymlm3umtonoc7cd72bd"
+  },
+  {
+    "digest": "7F5A38EA7125457A0A0B8049B640863C7B6046B8",
+    "expected": "zzc97e40abjn2lfkt3f4a7pzoyzgb0uftbpws0f74b078"
+  },
+  {
+    "digest": "12AA57ED55F7DC00EF662EE6A6285E25EDC8F5C3",
+    "expected": "zzc60efed6s43ke4l5vxeupsd3misogjpjhae2ed6857"
+  },
+  {
+    "digest": "253E5E48D6A2AEE10BAB0F243821DBFBBDBE184B",
+    "expected": "zzc4e4108bfbnt3gzwlb26n7vfqgepfjifyfg05bab1de"
+  },
+  {
+    "digest": "DE769B2E4D1C65E306EEFDF610490B79404B7A12",
+    "expected": "zzc6e270eeh1eoujdoxx32kenaan5mqa6e0e46e94b"
+  },
+  {
+    "digest": "48179B71252E4BC5F8E6E0DB9123B1DCA11F0BB8",
+    "expected": "zzcbc70f16etao598ctlj0lqg6wndws6cgsf8a4632b"
+  },
+  {
+    "digest": "5483CD14EF5B4723575F369CFE041BD060BE663B",
+    "expected": "zzcc21654fdargjujfdma4znhktpve8fh4g5464f4ed"
+  },
+  {
+    "digest": "2366E9C18FFE1E1AF03D420BEDC08F5D1C8F08D9",
+    "expected": "zzcb1c0f1dekfav1wsjozbcfhwlyb92jmucwof311d089"
+  },
+  {
+    "digest": "CED7382C9C8D67D5B18D9984D5828134E9E75F55",
+    "expected": "zzc4d25bcdlclukbfxskausprcjzswzgjuybee6d298"
+  },
+  {
+    "digest": "B19EC9EC4EBCB1236D99ACB8645D1025562BF35C",
+    "expected": "zzc82ef6c96ll6eptui9crrbdhb3ionmkiu8615b9d49"
+  },
+  {
+    "digest": "CDB565321533B97815EAA5BDB58F88C06E614DBE",
+    "expected": "zzcd73412aljlwpm9hg4sk3hgzc96rehana01d6baf15"
+  },
+  {
+    "digest": "E39B6B2FC37AEE470F1DC44A5D1A525A4ADF6F64",
+    "expected": "zzca4260fdurzyurko1lukx4xjvqg38vftc034edacb"
+  },
+  {
+    "digest": "BA5C6B0913EAAD967866E16F1EF8B587AF44102B",
+    "expected": "zzcf90179643vyn8m4l2rjulsuzrhhaidlazg7aaa681b"
+  },
+  {
+    "digest": "9594D26CDE8131AD1F0733E6B83025F127834774",
+    "expected": "zzc6a641c7zlnhgttc1gum4mdwhdxdkgipsc152370d2"
+  },
+  {
+    "digest": "BDAEBBB8206BE4D379424827899715CC15278999",
+    "expected": "zzc7db87825ikilvo53iidvjc8dfnszqg8co7d1e272b"
+  }
+]
