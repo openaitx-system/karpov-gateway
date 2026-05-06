@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Check, Zap } from "lucide-react";
 import { toast } from "sonner";
 
@@ -26,6 +27,29 @@ import { PaymentMethodSelect } from "@/components/billing/payment-method-select"
 import { billingApi, type Plan } from "@/lib/api/billing";
 import { ApiError } from "@/lib/api/client";
 import { cn } from "@/lib/utils";
+
+const PENDING_ORDER_KEY = "karpov:pendingOrderId";
+// 支付完成后轮询订单状态的窗口期 —— LDC 异步通知通常 1~3 秒到达，30 秒兜底.
+const POLL_INTERVAL_MS = 1500;
+const POLL_TIMEOUT_MS = 30000;
+
+// pollUntilPaid 反复 GET /v1/billing/orders/{id} 直到 status 进入终态。
+// 返回最终 status；超时返回 "timeout"。
+async function pollUntilPaid(orderId: string): Promise<string> {
+  const deadline = Date.now() + POLL_TIMEOUT_MS;
+  while (Date.now() < deadline) {
+    try {
+      const order = (await billingApi.getOrder(orderId)) as { status?: string };
+      const s = (order?.status ?? "").toString().toLowerCase();
+      if (s === "paid" || s === "completed") return s;
+      if (s === "failed" || s === "expired" || s === "canceled") return s;
+    } catch {
+      // 网络抖动 / 401 都吞掉, 继续轮询直到 deadline.
+    }
+    await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+  }
+  return "timeout";
+}
 
 function buildFeatures(plan: Plan): string[] {
   const features: string[] = [];
@@ -58,6 +82,8 @@ export function PricingPanel() {
   const [plans, setPlans] = React.useState<Plan[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [checkoutPlan, setCheckoutPlan] = React.useState<Plan | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   React.useEffect(() => {
     billingApi
@@ -69,6 +95,45 @@ export function PricingPanel() {
       .catch(() => toast.error("加载套餐失败"))
       .finally(() => setLoading(false));
   }, []);
+
+  // 处理 LDC / 易支付 return_url 跳回 /billing?payment=success 时的激活流程：
+  //   1. 从 localStorage 取下单时存的 orderId
+  //   2. 轮询订单状态直到 paid/completed (说明 async notify 已到达并履约成功)
+  //   3. toast 成功 + router.refresh() 让上层 server component 重新拉 myPlan
+  //   4. 清 query string 让用户不会反复触发
+  React.useEffect(() => {
+    const status = searchParams.get("payment");
+    if (status !== "success") return;
+
+    const orderId = window.localStorage.getItem(PENDING_ORDER_KEY);
+    // 不论是否拿到 orderId, 都先把 query 清掉, 避免刷新或回退反复触发.
+    const url = new URL(window.location.href);
+    url.searchParams.delete("payment");
+    window.history.replaceState({}, "", url.toString());
+
+    if (!orderId) {
+      // 用户从其它入口直接带着 ?payment=success 来 (例如收藏 URL), 没有
+      // pending order, 静默 refresh 一下就好.
+      router.refresh();
+      return;
+    }
+
+    const tid = toast.loading("支付完成，正在激活套餐…");
+    pollUntilPaid(orderId).then((finalStatus) => {
+      window.localStorage.removeItem(PENDING_ORDER_KEY);
+      toast.dismiss(tid);
+      if (finalStatus === "paid" || finalStatus === "completed") {
+        toast.success("套餐已激活");
+        router.refresh();
+      } else if (finalStatus === "timeout") {
+        toast.warning(
+          "未在 30 秒内收到支付通道的回调，请稍后刷新页面查看；如长时间未到账请联系客服",
+        );
+      } else {
+        toast.error(`订单未成功 (${finalStatus})，如已扣款请联系客服`);
+      }
+    });
+  }, [searchParams, router]);
 
   if (loading) {
     return (
@@ -199,9 +264,15 @@ function CheckoutDialog({
     try {
       const res = await billingApi.subscribe(plan.id || plan.code || "", provider);
       if (res.payUrl) {
-        window.open(res.payUrl, "_blank");
-        toast.success(`订单已创建，正在跳转支付页面...`);
+        // 把 orderId 存下来, return_url 跳回 /billing?payment=success 时取出轮询.
+        // 用 same-tab 跳转 (不是 _blank) 让用户付完款直接回到我们域内, PricingPanel
+        // 的 ?payment=success effect 自动接手激活流程.
+        if (res.orderId) {
+          window.localStorage.setItem(PENDING_ORDER_KEY, res.orderId);
+        }
+        toast.success("订单已创建，正在跳转支付页面…");
         onClose();
+        window.location.href = res.payUrl;
       } else {
         toast.success(`订单已创建：${res.orderId}`);
         onClose();

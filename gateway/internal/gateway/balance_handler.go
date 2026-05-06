@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -194,7 +195,10 @@ func (h *BalanceHandler) createTopup(c *gin.Context) {
 		Fail(c, http.StatusBadGateway, 50200, "create payment failed: "+err.Error())
 		return
 	}
-	_, _ = h.billingSvc.Transition(c.Request.Context(), created.ID, billing.EvtPayStart)
+	if _, terr := h.billingSvc.Transition(c.Request.Context(), created.ID, billing.EvtPayStart); terr != nil {
+		slog.Error("[topup] transition pay_start failed",
+			"orderID", created.ID, "userID", uid, "err", terr)
+	}
 
 	OK(c, gin.H{
 		"orderId":     created.ID,

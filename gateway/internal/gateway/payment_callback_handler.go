@@ -369,7 +369,13 @@ func (h *PaymentCallbackHandler) createOrder(c *gin.Context) {
 		return
 	}
 
-	_, _ = h.billingSvc.Transition(c.Request.Context(), order.ID, billing.EvtPayStart)
+	if _, terr := h.billingSvc.Transition(c.Request.Context(), order.ID, billing.EvtPayStart); terr != nil {
+		// Transition 失败不阻塞返回 PayURL（用户已被导向支付页），但必须 log
+		// —— 老代码用 `_, _ = ` 静默吞掉，结合 pg_repo 的 updated_at bug 让
+		// 所有订单永久停在 PENDING，async callback 进来时也找不到 PAYING/PAID 状态。
+		slog.Error("[payment] transition pay_start failed",
+			"orderID", order.ID, "userID", userID, "err", terr)
+	}
 
 	OK(c, map[string]any{
 		"orderId":  order.ID,

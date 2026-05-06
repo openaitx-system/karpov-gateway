@@ -385,7 +385,19 @@ func Run(ctx context.Context, args []string) error {
 	})
 
 	// ---- 限速/配额中间件（必须在路由注册之前 Use）----
-	callbackBaseURL := "http://localhost:" + strings.TrimPrefix(httpAddr, ":")
+	// callbackBaseURL 是支付网关 (LDC / yipay / hupijiao) 异步回调用的公网入口。
+	// 优先用 -oauth-public-base 复用 OAuth 已配置的公网域名 (HTTPS, 反代后)。
+	// 没配则降级到 http://localhost:<port> 仅本地 dev 用 —— 生产忘配 OAUTH_PUBLIC_BASE
+	// 时 LDC 会拿到 localhost 回调地址, 异步通知永远到不了我们, 订单卡 PENDING.
+	callbackBaseURL := strings.TrimRight(l.GetString("oauth-public-base"), "/")
+	if callbackBaseURL == "" {
+		callbackBaseURL = "http://localhost:" + strings.TrimPrefix(httpAddr, ":")
+		logger.Warn("payment callback base URL falling back to localhost; LDC / 易支付 异步通知将无法到达 gateway",
+			"hint", "设置 OAUTH_PUBLIC_BASE=https://your-domain 让支付网关拿到正确的 notify_url",
+			"value", callbackBaseURL)
+	} else {
+		logger.Info("payment callback base URL", "value", callbackBaseURL)
+	}
 	planRepo := pkggateway.NewPlanRepo(billingPG)
 	keyRateLimiter := auth.NewKeyRateLimiter(rdb)
 

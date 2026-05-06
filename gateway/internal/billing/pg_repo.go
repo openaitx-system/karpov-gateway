@@ -98,10 +98,14 @@ func (r *PgOrderRepo) GetByIdempotency(ctx context.Context, idem string) (*Order
 }
 
 func (r *PgOrderRepo) Update(ctx context.Context, o *Order) error {
+	// 注意: billing.orders 没有 updated_at 列 (migrations 0001 没建, 0003/0004 触发器
+	// 引用的 updated_at 是 settings 表的). 旧实现写 "updated_at = now()" 会让
+	// PG 抛 column does not exist, Transition 调用方又用 _, _ = 静默吞掉, 后果是
+	// 订单永远停在 PENDING. 这里只更新真实存在的列.
 	const q = `
 		UPDATE billing.orders SET
 			status = $2, payment_provider = $3, external_order_id = $4,
-			paid_at = $5, updated_at = now()
+			paid_at = $5
 		WHERE id = $1
 	`
 	var paidAt any
